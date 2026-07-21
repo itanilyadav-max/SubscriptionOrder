@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Oligo - Fresh Microgreens</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body { font-family: 'Poppins', sans-serif; padding-bottom: 90px; background-color: #f9fafb; -webkit-tap-highlight-color: transparent; }
+    
+    /* SCROLLBAR HIDING */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* ANIMATIONS */
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .nav-active { color: #10b981; }
+    
+    /* CARDS */
+    .product-card { transition: all 0.3s ease; border: 1px solid #f3f4f6; }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    .modern-card { background: white; border-radius: 32px; border: 1px solid #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+
+    /* CATEGORY PILLS */
+    .cat-pill { transition: all 0.2s ease; white-space: nowrap; border: 1px solid #e5e7eb; background: white; color: #6b7280; padding: 6px 16px; border-radius: 9999px; font-size: 13px; }
+    .cat-pill.active { background-color: #10b981; color: white !important; border-color: #10b981; font-weight: 600; }
+    
+    /* LOADER */
+    #appLoader { position: fixed; inset: 0; background: white; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* BUTTONS & BADGES */
+    .btn-dark { background-color: #0f172a; color: white; border-radius: 16px; font-weight: 700; transition: all 0.2s; }
+    .btn-dark:hover { background-color: #000; transform: scale(1.02); }
+    .status-badge { font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 99px; text-transform: uppercase; }
+
+    /* SUBSCRIPTION TOGGLES */
+    .day-btn { border: 1px solid #e5e7eb; color: #6b7280; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+    .day-btn.selected { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3); }
+
+    /* SEARCH RESULTS */
+    .search-results { position: absolute; left: 0; right: 0; top: 100%; background: white; border: 1px solid #e2e8f0; border-radius: 16px; margin-top: 5px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); z-index: 100; max-height: 250px; overflow-y: auto; }
+    .search-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; align-items: start; gap: 12px; transition: background 0.2s; }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: #f0fdf4; }
+    .search-item i { color: #10b981; margin-top: 3px; font-size: 14px; }
+    .search-item .details { display: flex; flex-direction: column; }
+    .search-item .name { font-weight: 700; font-size: 13px; color: #1e293b; line-height: 1.2; }
+    .search-item .addr { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+    /* HOLIDAY ANIMATION */
+    @keyframes blink-red {
+        0%, 100% { background-color: #fee2e2; border-color: #ef4444; }
+        50% { background-color: #fecaca; border-color: #f87171; }
+    }
+    .holiday-alert { animation: blink-red 2s infinite; border: 1px solid #ef4444; }
+
+    /* TOAST NOTIFICATION */
+    #toast {
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translate(0, -20px);
+        z-index: 9999; padding: 12px 24px; border-radius: 99px; font-size: 13px; font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        width: max-content; max-width: 90%; text-align: center; opacity: 0; pointer-events: none;
+    }
+    #toast.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+
+    /* CALENDAR STYLES */
+    input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; filter: invert(0.5); }
+    input[type="date"] { position: relative; }
+    
+    /* CUSTOM VISUAL CALENDAR */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 10px; font-weight: 600; }
+    .cal-header { font-size: 10px; font-weight: bold; color: #9ca3af; text-align: center; padding-bottom: 4px; text-transform: uppercase; }
+    .cal-day.empty { background: transparent; }
+    
+    .cal-day.delivery { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; cursor: pointer; }
+    .cal-day.delivery:hover { background-color: #2563eb; color: white; }
+    
+    .cal-day.holiday { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; opacity: 0.8; cursor: not-allowed; }
+    .cal-day.skipped { background-color: #fff7ed; color: #c2410c; border: 1px dashed #fdba74; text-decoration: line-through; opacity: 0.8; }
+    .cal-day.added { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #d8b4fe; font-weight: 800; }
+    .cal-day.normal { color: #374151; background-color: #f9fafb; border: 1px solid transparent; cursor: pointer; }
+    .cal-day.normal:hover { background-color: #f3f4f6; border-color: #e5e7eb; }
+    .cal-day.out-of-range { color: #d1d5db; background-color: transparent; border: 1px solid transparent; opacity: 0.4; pointer-events: none; }
+
+    /* SEGMENTED PILL TAB SWITCHER (Orders/Subscriptions) */
+    .seg-switcher { background: #f1f5f9; border-radius: 16px; padding: 4px; display: flex; gap: 4px; }
+    .seg-btn { flex: 1; text-align: center; padding: 10px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #6b7280; transition: all 0.2s ease; }
+    .seg-btn.active { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16,185,129,0.3); }
+
+    /* ITEM CHIPS */
+    .item-chip { display: inline-flex; align-items: center; background: #f8fafc; border: 1px solid #eef2f7; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; margin: 2px 4px 2px 0; }
+
+    /* TAP-FRIENDLY ACTION BUTTONS */
+    .action-btn { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border-radius: 999px; font-size: 12px; font-weight: 700; transition: all 0.15s ease; }
+    .action-btn:active { transform: scale(0.95); }
+
+    /* SKELETON LOADERS */
+    .skel { background: linear-gradient(90deg, #f1f5f9 25%, #e9edf2 37%, #f1f5f9 63%); background-size: 400% 100%; animation: skel-shine 1.4s ease infinite; border-radius: 12px; }
+    @keyframes skel-shine { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    .skel-card { border-radius: 32px; border: 1px solid #f1f5f9; padding: 24px; background: white; }
+
+    /* EMPTY STATES */
+    .empty-state { text-align: center; padding: 56px 20px; }
+    .empty-state .icon-wrap { width: 64px; height: 64px; border-radius: 24px; background: #f0fdf4; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+</style>
+</head>
+<body class="text-gray-800 select-none bg-gray-50 h-screen overflow-hidden flex flex-col">
+
+<!-- APP LOADER -->
+<div id="appLoader">
+    <div class="spinner mb-4"></div>
+    <h2 class="text-green-600 font-bold text-2xl tracking-tighter">Oligo<span class="text-black">.</span></h2>
+</div>
+
+<!-- TOAST MESSAGE (Global) -->
+<div id="toast" class="bg-gray-900 text-white">Message here</div>
+
+<!-- AUTH SECTION -->
+<section id="authSection" class="fixed inset-0 z-50 bg-white flex flex-col justify-center items-center px-6 hidden w-full overflow-y-auto">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-green-600 tracking-tighter">Oligo<span class="text-black">.</span></h1>
+            <p class="text-gray-500 text-sm">Fresh Microgreens Delivered</p>
+        </div>
+        
+        <div id="loginBox" class="w-full fade-in">
+            <form id="loginForm" class="space-y-4 p-8 bg-white rounded-[32px] shadow-xl border border-gray-100" novalidate>
+                <h2 class="text-xl font-bold">Welcome Back</h2>
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <input type="password" id="loginPass" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-[0.98] transition">Login</button>
+                <div class="text-center pt-2">
+                    <button type="button" onclick="window.toggleRecovery(true)" class="text-xs font-bold text-gray-400 hover:text-green-600 transition">Forgot Password?</button>
+                </div>
+            </form>
+            <p class="text-center mt-6 text-sm text-gray-500">
+                New to Oligo? <button type="button" onclick="window.toggleAuth(true)" class="text-green-600 font-bold">Create Account</button>
+            </p>
+        </div>
+
+        <div id="registerBox" class="w-full hidden fade-in">
+            <form id="registerForm" class="space-y-4 p-8 bg-white rounded-[32px] shadow-xl border border-gray-100" novalidate>
+                <h2 class="text-xl font-bold">Start Eating Fresh</h2>
+                <input type="text" id="regName" placeholder="Full Name" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <input type="email" id="regEmail" placeholder="Email" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <input type="tel" id="regPhone" placeholder="Phone (e.g. 9876543210)" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <input type="password" id="regPass" placeholder="Password (Min 6 chars)" class="w-full p-4 bg-gray-50 rounded-2xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500">
+                <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-[0.98] transition">Register</button>
+            </form>
+            <p class="text-center mt-6 text-sm text-gray-500">
+                Already have an account? <button type="button" onclick="window.toggleAuth(false)" class="text-green-600 font-bold">Login</button>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- RECOVERY MODAL -->
+<div id="recoveryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] hidden flex justify-center items-center px-6">
+    <div class="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl relative">
+        <button onclick="window.toggleRecovery(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
+        <h2 class="text-xl font-bold mb-1">Trouble Logging In?</h2>
+        <p class="text-gray-500 text-xs mb-6">Recover your account securely.</p>
+        <div>
+            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Registered Email</label>
+            <input type="email" id="recInputEmail" placeholder="Enter your email" class="w-full p-3 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500 text-sm mb-4">
+            <button onclick="window.sendResetLink()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">Send Reset Link</button>
+        </div>
+    </div>
+</div>
+
+<!-- MANAGE SUBSCRIPTION MODAL -->
+<div id="subManageModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex flex-col justify-end sm:justify-center sm:items-center">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl w-full max-w-lg mx-auto h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-gray-800">Plan Overview</h2>
+                <p class="text-xs text-gray-400 font-medium" id="subManageId">ID: #...</p>
+            </div>
+            <button onclick="window.closeSubManage()" class="text-gray-400 bg-gray-100 w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200 transition"><i class="fas fa-times text-lg"></i></button>
+        </div>
+
+        <!-- Progress Card -->
+        <div class="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-[24px] border border-blue-100 mb-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fas fa-calendar-check text-6xl text-blue-600"></i></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Progress</span>
+                    <span class="text-xs font-bold text-blue-700 bg-white px-2 py-0.5 rounded-full" id="subStatusBadge">Active</span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-1" id="subTotalDeliveries">0/0</h3>
+                <p class="text-xs text-gray-500 font-medium mb-4">Deliveries Completed</p>
+                <div class="w-full bg-white h-2 rounded-full overflow-hidden">
+                    <div id="subProgressBar" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between mt-4 pt-4 border-t border-blue-100">
+                    <div><p class="text-[9px] text-gray-400 font-bold uppercase">Start Date</p><p class="text-xs font-bold text-gray-700" id="subStartDate">-</p></div>
+                    <div class="text-right"><p class="text-[9px] text-gray-400 font-bold uppercase">End Date</p><p class="text-xs font-bold text-gray-700" id="subEndDate">-</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items List -->
+        <div class="mb-6">
+            <h4 class="font-bold text-gray-800 text-sm mb-3 ml-1">Included Items</h4>
+            <div id="subItemsList" class="space-y-2"></div>
+        </div>
+
+        <!-- Reschedule / Vacation Mode -->
+        <div class="bg-orange-50 border border-orange-100 p-5 rounded-[24px]">
+            <h4 class="font-bold text-orange-800 text-sm mb-1 flex items-center gap-2"><i class="fas fa-plane"></i> Vacation Mode / Reschedule</h4>
+            <p class="text-[10px] text-orange-600 mb-4 leading-tight">Select a delivery date below to skip or move.</p>
+            
+            <!-- Custom Visual Calendar -->
+            <div class="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <button onclick="window.changeCalMonth(-1)" class="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><i class="fas fa-chevron-left text-[10px]"></i></button>
+                    <span id="calMonthYear" class="text-xs font-bold text-gray-700 uppercase tracking-widest">Month Year</span>
+                    <button onclick="window.changeCalMonth(1)" class="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200"><i class="fas fa-chevron-right text-[10px]"></i></button>
+                </div>
+                <div class="cal-grid mb-1">
+                    <div class="cal-header">S</div><div class="cal-header">M</div><div class="cal-header">T</div><div class="cal-header">W</div><div class="cal-header">T</div><div class="cal-header">F</div><div class="cal-header">S</div>
+                </div>
+                <div id="visualCalendar" class="cal-grid"></div>
+                <div class="flex gap-4 mt-3 justify-center">
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-blue-100 border border-blue-200 rounded"></div><span class="text-[9px] text-gray-400 font-medium">Delivery</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-red-100 border border-red-200 rounded"></div><span class="text-[9px] text-gray-400 font-medium">Closed</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-orange-100 border border-orange-200 rounded"></div><span class="text-[9px] text-gray-400 font-medium">Skipped</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 bg-purple-100 border border-purple-200 rounded"></div><span class="text-[9px] text-gray-400 font-medium">New Date</span></div>
+                </div>
+            </div>
+
+            <div id="activeModificationsList" class="mb-4"></div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Skip Date</label>
+                    <input type="date" id="vacationDate" class="w-full p-3 bg-white rounded-xl text-sm font-bold text-gray-700 border border-orange-200 outline-none focus:ring-2 focus:ring-orange-400" onclick="window.setTargetInput('vacationDate')" onchange="window.validateVacationDate(this)">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">New Delivery Date (Optional)</label>
+                    <input type="date" id="newDeliveryDate" class="w-full p-3 bg-white rounded-xl text-sm font-bold text-gray-700 border border-orange-200 outline-none focus:ring-2 focus:ring-orange-400" onclick="window.setTargetInput('newDeliveryDate')">
+                </div>
+                <button onclick="window.submitReschedule()" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold text-xs shadow-md transition">Request Change</button>
+            </div>
+        </div>
+        
+        <!-- Cancel/Delete Subscription Section -->
+        <div class="mt-6 border-t border-gray-100 pt-4">
+            <button onclick="window.cancelSubscription()" class="w-full text-red-500 font-bold text-xs py-3 border border-red-100 rounded-xl hover:bg-red-50 transition">Cancel Subscription Plan</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div id="mainApp" class="hidden flex h-full overflow-hidden w-full relative">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <aside id="desktopSidebar" class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 flex-shrink-0 z-20">
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center gap-3 mb-2">
+                <i class="fas fa-seedling text-green-600 text-2xl"></i>
+                <h1 class="font-bold text-xl text-green-800 tracking-tight">Oligo</h1>
+            </div>
+            <div class="pl-1">
+                <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Welcome back,</p>
+                <p id="desktopUserName" class="text-sm font-bold text-gray-700">User</p>
+            </div>
+        </div>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+            <button onclick="window.navTo('viewHome')" id="desk-nav-viewHome" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition nav-active">
+                <i class="fas fa-home w-5 text-lg"></i> Shop
+            </button>
+            <button onclick="window.navTo('viewOrders')" id="desk-nav-viewOrders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">
+                <i class="fas fa-receipt w-5 text-lg"></i> Orders & Subs
+            </button>
+            <button onclick="window.navTo('viewProfile')" id="desk-nav-viewProfile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">
+                <i class="fas fa-user-circle w-5 text-lg"></i> Profile
+            </button>
+            <button onclick="window.navTo('viewPayments')" id="desk-nav-viewPayments" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">
+                <i class="fas fa-wallet w-5 text-lg"></i> Payments
+            </button>
+            <button onclick="window.navTo('viewComplaints')" id="desk-nav-viewComplaints" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition">
+                <i class="fas fa-comment-dots w-5 text-lg"></i> Complaints
+            </button>
+            
+            <div class="mt-8 border-t border-gray-100 pt-4">
+                 <button onclick="window.logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition">
+                    <i class="fas fa-sign-out-alt w-5 text-lg"></i> Log Out
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <div class="flex-1 flex flex-col h-full w-full relative overflow-hidden">
+        
+        <!-- MOBILE HEADER -->
+        <header class="lg:hidden bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-seedling text-green-600 text-2xl"></i>
+                <h1 class="font-bold text-2xl text-green-700 tracking-tight">Oligo</h1>
+                <div class="flex flex-col ml-2">
+                    <span class="text-[9px] text-gray-400 uppercase tracking-wider leading-none">Welcome</span>
+                    <span id="headerUserName" class="text-sm font-bold text-gray-700 leading-none">Guest</span>
+                </div>
+            </div>
+            <div class="relative cursor-pointer bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full active:bg-gray-200 transition" onclick="window.openCart()">
+                <i class="fas fa-shopping-bag text-xl text-gray-700"></i>
+                <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white hidden">0</span>
+            </div>
+        </header>
+
+        <!-- DESKTOP HEADER (Cart Only) -->
+        <header class="hidden lg:flex justify-end items-center px-8 py-4 bg-white border-b border-gray-100 shrink-0">
+             <div class="relative cursor-pointer bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition" onclick="window.openCart()">
+                <i class="fas fa-shopping-bag text-xl text-gray-700"></i>
+                <span id="deskCartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white hidden">0</span>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 w-full max-w-7xl mx-auto custom-scroll" id="mainScroll">
+            
+            <!-- HOME VIEW -->
+            <div id="viewHome" class="fade-in block">
+                <div id="holidayAlertBanner" class="hidden mb-6 p-4 rounded-2xl holiday-alert text-red-900 shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-calendar-times text-xl mt-1"></i>
+                        <div>
+                            <h3 class="font-bold text-sm uppercase tracking-wide">Holiday Alert</h3>
+                            <p id="holidayAlertMsg" class="text-xs mt-1 font-medium leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h2 class="font-bold text-2xl mb-1 tracking-tight">Healthy Choice</h2>
+                    <p class="text-gray-500 text-sm">Locally grown nutrition.</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[32px] p-6 mb-6 text-white shadow-lg shadow-blue-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Subscribe & Save</h3>
+                        <p class="text-xs opacity-90 mb-3">Setup weekly deliveries and never run out.</p>
+                        <button onclick="window.openCart(); document.getElementById('subToggle').checked=true; window.toggleSubscriptionMode()" class="bg-white text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-bold shadow active:scale-95 transition">Setup Now</button>
+                    </div>
+                    <div class="text-4xl opacity-20"><i class="fas fa-calendar-check"></i></div>
+                </div>
+
+                <h3 class="font-bold text-lg mb-4 ml-1">Our Producers</h3>
+                <div id="producersList" class="space-y-4 grid lg:grid-cols-2 lg:gap-6 lg:space-y-0"></div>
+            </div>
+
+            <!-- MENU VIEW -->
+            <div id="viewMenu" class="fade-in hidden">
+                <button onclick="window.navTo('viewHome')" class="mb-4 text-sm text-gray-400 font-medium flex items-center hover:text-green-600 transition"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                <div class="mb-4 ml-1">
+                    <h2 id="menuTitle" class="text-2xl font-bold text-gray-900">Farm Name</h2>
+                    <p id="menuCuisine" class="text-sm text-gray-500">Pure Organic Harvest</p>
+                </div>
+                <div id="categoryBar" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-4 sticky top-0 bg-[#f9fafb]/95 backdrop-blur-sm z-30 py-2"></div>
+                <div id="menuList" class="space-y-4 grid lg:grid-cols-2 lg:gap-6 lg:space-y-0"></div>
+            </div>
+
+            <!-- ORDERS VIEW -->
+            <div id="viewOrders" class="fade-in hidden">
+                <h2 class="font-bold text-2xl mb-4 ml-1 tracking-tight">My Orders</h2>
+                <div class="seg-switcher mb-6">
+                    <button onclick="window.switchOrderView('history')" id="tab-btn-history" class="seg-btn active">One-Time Orders</button>
+                    <button onclick="window.switchOrderView('subs')" id="tab-btn-subs" class="seg-btn">Subscriptions</button>
+                </div>
+
+                <div id="ordersList" class="space-y-4 block grid lg:grid-cols-2 lg:gap-6 lg:space-y-0"></div>
+                <div id="subsList" class="space-y-4 hidden grid lg:grid-cols-2 lg:gap-6 lg:space-y-0"></div>
+            </div>
+
+            <!-- PROFILE VIEW -->
+            <div id="viewProfile" class="fade-in hidden">
+                <div class="flex items-center gap-5 mb-8 ml-1">
+                    <div class="w-16 h-16 bg-green-500 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-green-200">
+                        <i class="fas fa-user text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-2xl text-gray-900 leading-tight" id="profTitleName">Loading Profile...</h2>
+                        <p class="text-[10px] font-bold text-green-500 uppercase tracking-widest">Account Verified</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+                    <div class="modern-card p-8">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-8">Personal Details</span>
+                        <div class="space-y-8">
+                            <div>
+                                <span class="text-[10px] font-bold text-green-600 uppercase block mb-1">Full Name *</span>
+                                <input type="text" id="profName" class="w-full py-2 border-b border-gray-100 outline-none focus:border-green-500 transition text-sm font-medium bg-transparent">
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-green-600 uppercase block mb-1">Phone Contact *</span>
+                                <input type="tel" id="profPhone" class="w-full py-2 border-b border-gray-100 outline-none focus:border-green-500 transition text-sm font-medium bg-transparent" placeholder="e.g. 9876543210">
+                            </div>
+                        </div>
+                        <button onclick="window.updateProfile()" class="mt-10 px-10 py-4 btn-dark text-sm shadow-xl w-full sm:w-auto">Save Changes</button>
+                    </div>
+
+                    <div class="modern-card p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saved Addresses</span>
+                            <button onclick="window.toggleAddrForm()" class="text-green-600 font-bold flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full text-xs hover:bg-green-100 transition">
+                                <i class="fas fa-plus"></i> Add New
+                            </button>
+                        </div>
+                        <div id="addrForm" class="hidden bg-gray-50 p-6 rounded-[24px] border border-dashed border-gray-200 mb-6 space-y-4">
+                            <input type="text" id="newJointName" placeholder="Restaurant or Joint Name * (e.g. Hyatt, Office)" class="w-full p-4 rounded-2xl border-none outline-none ring-1 ring-gray-200 text-sm focus:ring-2 focus:ring-green-500">
+                            <input type="text" id="newLocName" placeholder="Location/Area * (e.g. Andheri, BKC...)" class="w-full p-4 rounded-2xl border-none outline-none ring-1 ring-gray-200 text-sm focus:ring-2 focus:ring-green-500">
+                            <div class="relative">
+                                <textarea id="newFullAddr" oninput="window.addressSearch(this)" placeholder="Search or Enter Full Address * (e.g. Landmark, Wing, Floor...)" class="w-full p-4 rounded-2xl border-none outline-none ring-1 ring-gray-200 text-sm focus:ring-2 focus:ring-green-500" rows="3"></textarea>
+                                <div id="addrSearchList" class="search-results hidden"></div>
+                            </div>
+                            <button onclick="window.saveNewAddress()" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-sm shadow-md active:scale-95 transition">Save Location</button>
+                        </div>
+                        <div id="addressList" class="grid grid-cols-1 gap-4"></div>
+                    </div>
+
+                    <div class="modern-card p-8 bg-green-50 border-green-100 lg:col-span-2">
+                        <span class="text-[10px] font-bold text-green-600 uppercase tracking-widest block mb-4">Refer a Friend</span>
+                        <p class="text-xs text-gray-500 mb-4 leading-relaxed">Know someone who loves fresh greens? Enter their email below to send them an invite link!</p>
+                        <div class="flex gap-2">
+                            <input type="email" id="referralEmail" placeholder="Friend's Email Address" class="flex-1 p-3 bg-white rounded-xl outline-none ring-1 ring-gray-200 text-sm focus:ring-2 focus:ring-green-500">
+                            <button onclick="window.sendReferral()" class="bg-green-600 text-white px-5 py-3 rounded-xl font-bold text-xs shadow-md active:scale-95 transition whitespace-nowrap">Send Invite</button>
+                        </div>
+                    </div>
+
+                    <button onclick="window.logout()" class="w-full py-5 text-red-500 font-bold text-xs uppercase tracking-widest border border-dashed border-red-100 rounded-[24px] hover:bg-red-50 transition lg:col-span-2">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Log Out Account
+                    </button>
+                </div>
+            </div>
+            
+            <!-- PAYMENTS VIEW -->
+            <div id="viewPayments" class="fade-in hidden">
+                <div class="flex items-center gap-5 mb-8 ml-1">
+                    <div class="w-16 h-16 bg-purple-500 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-purple-200">
+                        <i class="fas fa-wallet text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-2xl text-gray-900 leading-tight">Payments & Ledger</h2>
+                        <p class="text-[10px] font-bold text-purple-500 uppercase tracking-widest">Financial Overview</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="modern-card p-8 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+                         <div class="absolute top-0 right-0 p-6 opacity-10"><i class="fas fa-file-invoice-dollar text-8xl"></i></div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Total Outstanding</p>
+                        <h3 class="text-4xl font-bold mb-1" id="payTotalOutstanding">₹0</h3>
+                        <p class="text-[10px] text-gray-400 mb-4">As per latest ledger update</p>
+                        <button id="payNowBtn" onclick="window.payNow()" class="hidden bg-green-500 hover:bg-green-600 text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-md active:scale-95 transition items-center gap-2">
+                            <i class="fas fa-bolt"></i> Pay Now via UPI
+                        </button>
+                    </div>
+                    <div class="modern-card p-8 border border-purple-100 bg-purple-50">
+                        <p class="text-xs font-bold text-purple-600 uppercase tracking-widest mb-4">Status</p>
+                        <div id="payStatusContainer">
+                            <p class="text-sm text-gray-600 italic">Loading details...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="paySplitRow" class="hidden grid grid-cols-2 gap-4 mb-6">
+                    <div class="modern-card p-5 border border-green-100 bg-green-50">
+                        <p class="text-[10px] font-bold text-green-600 uppercase tracking-widest mb-1">Total Paid</p>
+                        <p class="text-lg font-bold text-gray-800" id="payTotalPaid">₹0</p>
+                    </div>
+                    <div class="modern-card p-5 border border-orange-100 bg-orange-50">
+                        <p class="text-[10px] font-bold text-orange-600 uppercase tracking-widest mb-1">Pending</p>
+                        <p class="text-lg font-bold text-gray-800" id="payTotalPending">₹0</p>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-lg mb-4 ml-1 text-gray-800">Transaction History</h3>
+                <div id="paymentHistoryList" class="space-y-4">
+                    <div class="skel-card"><div class="flex justify-between items-center"><div class="skel" style="width:150px;height:14px;"></div><div class="skel" style="width:60px;height:14px;"></div></div></div>
+                </div>
+            </div>
+
+            <!-- COMPLAINTS VIEW -->
+            <div id="viewComplaints" class="fade-in hidden">
+                <div class="flex items-center gap-5 mb-8 ml-1">
+                    <div class="w-16 h-16 bg-red-500 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-red-200">
+                        <i class="fas fa-comment-dots text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-2xl text-gray-900 leading-tight">Support & Complaints</h2>
+                        <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest">We are here to help</p>
+                    </div>
+                </div>
+
+                <div class="modern-card p-8 mb-8">
+                    <h3 class="font-bold text-lg text-gray-800 mb-6">Raise a Complaint</h3>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Issue Description</label>
+                            <textarea id="complaintDesc" rows="4" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-red-500 text-sm resize-none" placeholder="Describe the problem..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Attachments (Max 3 Images)</label>
+                            <input type="file" id="complaintImages" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 transition"/>
+                        </div>
+                        <button onclick="window.submitComplaint()" class="w-full bg-gray-900 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-black transition active:scale-95">Submit Complaint</button>
+                    </div>
+                </div>
+
+                <div class="modern-card p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">My Complaints</span>
+                        <div class="flex gap-1 bg-gray-100 rounded-xl p-1">
+                            <button onclick="window.filterMyComplaints('all')" id="cf-all" class="cf-btn px-3 py-1 rounded-lg text-xs font-bold bg-white shadow text-gray-800">All</button>
+                            <button onclick="window.filterMyComplaints('open')" id="cf-open" class="cf-btn px-3 py-1 rounded-lg text-xs font-bold text-gray-500">Pending</button>
+                            <button onclick="window.filterMyComplaints('resolved')" id="cf-resolved" class="cf-btn px-3 py-1 rounded-lg text-xs font-bold text-gray-500">Resolved</button>
+                        </div>
+                    </div>
+                    <div id="complaintsList" class="space-y-3">
+                        <div class="text-center py-10 text-gray-400 text-sm">Loading complaints...</div>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+
+        <!-- MOBILE NAV -->
+        <nav class="lg:hidden bg-white border-t border-gray-200 flex justify-around py-3 pb-safe z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0">
+            <button onclick="window.navTo('viewHome')" id="nav-viewHome" class="flex flex-col items-center nav-active group w-16">
+                <i class="fas fa-home text-lg mb-1 transition-transform group-active:scale-90"></i><span class="text-[10px] font-bold uppercase tracking-tighter">Shop</span>
+            </button>
+            <button onclick="window.navTo('viewOrders')" id="nav-viewOrders" class="flex flex-col items-center group w-16">
+                <i class="fas fa-receipt text-lg mb-1 transition-transform group-active:scale-90"></i><span class="text-[10px] font-bold uppercase tracking-tighter">Orders</span>
+            </button>
+            <button onclick="window.navTo('viewPayments')" id="nav-viewPayments" class="flex flex-col items-center group w-16">
+                <i class="fas fa-wallet text-lg mb-1 transition-transform group-active:scale-90"></i><span class="text-[10px] font-bold uppercase tracking-tighter">Pay</span>
+            </button>
+            <button onclick="window.navTo('viewComplaints')" id="nav-viewComplaints" class="flex flex-col items-center group w-16">
+                <i class="fas fa-comment-dots text-lg mb-1 transition-transform group-active:scale-90"></i><span class="text-[10px] font-bold uppercase tracking-tighter">Help</span>
+            </button>
+            <button onclick="window.navTo('viewProfile')" id="nav-viewProfile" class="flex flex-col items-center group w-16">
+                <i class="fas fa-user-circle text-lg mb-1 transition-transform group-active:scale-90"></i><span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- CART & SUBSCRIPTION MODAL -->
+<div id="cartModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex flex-col justify-end sm:justify-center sm:items-center">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl max-h-[90vh] overflow-y-auto w-full max-w-xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold tracking-tight">Your Basket</h2>
+            <button onclick="window.closeCart()" class="text-gray-400 w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        
+        <div id="cartItems" class="space-y-6 mb-8 max-h-[30vh] overflow-y-auto pr-2 custom-scroll"></div>
+        
+        <div class="border-t border-gray-100 pt-6 space-y-5">
+            
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                    <span class="text-sm font-bold text-blue-800">Subscribe & Save</span>
+                    <p class="text-[10px] text-blue-600 leading-tight">Get this basket delivered weekly</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="subToggle" class="sr-only peer" onchange="window.toggleSubscriptionMode()">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-2xl">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Deliver To</span>
+                    <select id="checkoutAddrSelect" class="w-full bg-transparent border-none font-bold text-sm outline-none focus:ring-0 cursor-pointer">
+                        <option value="">-- Choose --</option>
+                    </select>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-2xl" id="deliveryConfigContainer">
+                    <div id="oneTimeConfig">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Delivery Date</span>
+                        <input type="date" id="checkoutDate" class="w-full bg-transparent border-none font-bold text-sm outline-none focus:ring-0 cursor-pointer text-gray-800">
+                    </div>
+                    
+                    <div id="subConfig" class="hidden">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-2">Delivery Days</span>
+                        <div class="flex flex-wrap gap-2" id="daySelector">
+                            <button onclick="window.toggleDay(this, 'Mon')" class="day-btn">M</button>
+                            <button onclick="window.toggleDay(this, 'Tue')" class="day-btn">T</button>
+                            <button onclick="window.toggleDay(this, 'Wed')" class="day-btn">W</button>
+                            <button onclick="window.toggleDay(this, 'Thu')" class="day-btn">T</button>
+                            <button onclick="window.toggleDay(this, 'Fri')" class="day-btn">F</button>
+                            <button onclick="window.toggleDay(this, 'Sat')" class="day-btn">S</button>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Duration</span>
+                            <select id="subDuration" class="w-full bg-transparent border-none font-bold text-xs outline-none focus:ring-0">
+                                <option value="4 Weeks">1 Month (4 Weeks)</option>
+                                <option value="12 Weeks">3 Months (12 Weeks)</option>
+                                <option value="Until Cancelled">Until Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-2xl">
+                <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Message for Production (Optional)</span>
+                <textarea id="orderNote" placeholder="e.g. Deliver by 10am..." class="w-full bg-transparent border-none text-sm outline-none focus:ring-0 text-gray-800 resize-none" rows="2"></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <div id="deliveryFeeSection" class="flex justify-between items-center px-2 hidden">
+                    <span class="text-gray-400 font-medium text-xs">Delivery Fee</span>
+                    <span id="deliveryFeeDisplay" class="text-sm font-bold text-gray-800">₹0</span>
+                </div>
+                <p id="deliveryMessage" class="px-2 text-[10px] font-bold italic"></p>
+
+                <div class="flex justify-between items-center px-2 pt-2">
+                    <span class="text-gray-400 font-medium" id="totalLabel">Grand Total</span>
+                    <span id="cartTotal" class="text-2xl font-bold text-green-700 tracking-tighter">Box 0</span>
+                </div>
+                <p id="subTotalNote" class="text-right px-2 text-[10px] text-blue-600 font-bold hidden">Per Delivery Estimate</p>
+            </div>
+            
+            <button id="orderBtn" type="button" onclick="window.placeOrder()" class="w-full bg-green-600 text-white py-5 rounded-[24px] font-bold shadow-xl shadow-green-100 disabled:opacity-50 transition active:scale-[0.98]">Confirm Order (COD)</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, set, onValue, push, remove, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    
+    // Removed firebase-messaging import as it often causes loading issues in file:// contexts without a Service Worker.
+
+    const firebaseConfig = { apiKey: "AIzaSyCtR2jdbu-SZ-7obmg88fPksJnNxk9BnqQ", authDomain: "oligo-store.firebaseapp.com", projectId: "oligo-store", storageBucket: "oligo-store.firebasestorage.app", messagingSenderId: "891788554016", appId: "1:891788554016:web:206c7da0a562fb7b1bf145" };
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+
+    // TODO: replace with your real UPI ID (e.g. "oligofarm@upi" or your bank's VPA).
+    // Used to build the "Pay Now" deep link on the Payments tab.
+    const OLIGO_UPI_ID = "oligo@placeholder";
+    const OLIGO_UPI_PAYEE_NAME = "Oligo Microgreens";
+    
+    // --- UTILS ---
+    function getFriendlyErrorMessage(error) {
+        const code = error.code;
+        if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') return "Incorrect email or password.";
+        if (code === 'auth/email-already-in-use') return "This email is already registered.";
+        if (code === 'auth/weak-password') return "Password must be at least 6 characters.";
+        if (code === 'auth/invalid-email') return "Invalid email address format.";
+        return error.message || "An error occurred. Try again.";
+    }
+
+    let userLocalData = null; 
+    let basket = [];
+    try {
+         basket = JSON.parse(localStorage.getItem('oligo_basket')) || [];
+    } catch(e) {
+         basket = [];
+    }
+
+    let menuData = {};
+    let allOrdersData = {}; 
+    let allSubsData = {};
+    let holidaysData = {};
+    let editingOrderId = null; 
+    let currentDeliveryFee = 0; 
+    let currentDeliveryMethod = "Standard";
+    let selectedSubscriptionDays = [];
+    let currentManagingSubId = null;
+    let currentVisualMonth = new Date().getMonth();
+    let currentVisualYear = new Date().getFullYear();
+    let targetInputId = 'vacationDate';
+    let allModifications = {};
+    let currentAmountDue = 0;
+
+    // Loader Fallback Timeout
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if(loader && loader.style.display !== 'none') {
+             // If loader is still visible after 8 seconds, force hide (likely network or silent error)
+             // But usually auth state change handles it. This is a safety net.
+             // We won't force hide here to avoid showing broken UI if critical JS failed, 
+             // but if auth state listener didn't fire, we might be offline.
+             // We rely on onAuthStateChanged primarily.
+        }
+    }, 8000);
+
+    // --- NEW HELPER: Get Next SUBSCRIPTION Date ---
+    function getNextSubscriptionDate(selectedDays) {
+        const dayMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
+        let checkDate = new Date();
+        // CHANGED: We start checking from Today (0), not Tomorrow (+1), 
+        // to check if today itself matches one of the selected days.
+        // If today is a match (and not Sunday/Holiday), the order is for TODAY.
+        checkDate.setDate(checkDate.getDate()); 
+
+        // Safety limit to prevent infinite loops (e.g. if user selects nothing or only holidays)
+        let attempts = 0;
+        while (attempts < 60) {
+            const dayIndex = checkDate.getDay();
+            const dayName = Object.keys(dayMap).find(key => dayMap[key] === dayIndex);
+            
+            // Format to YYYY-MM-DD for holiday check
+            const year = checkDate.getFullYear();
+            const month = String(checkDate.getMonth() + 1).padStart(2, '0');
+            const day = String(checkDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
+            const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
+
+            // 1. Must not be Sunday
+            // 2. Must not be Holiday
+            // 3. Must be one of the selected subscription days
+            if (dayIndex !== 0 && !isHoliday && selectedDays.includes(dayName)) {
+                return dateStr;
+            }
+
+            checkDate.setDate(checkDate.getDate() + 1);
+            attempts++;
+        }
+        return getNextValidDeliveryDate(); // Fallback if loop fails
+    }
+
+    function getNextValidDeliveryDate() {
+        let checkDate = new Date();
+        checkDate.setDate(checkDate.getDate() + 1); // Start tomorrow
+        let isValid = false;
+        let attempts = 0;
+        while (!isValid && attempts < 30) { // Safety break
+            attempts++;
+            const dayOfWeek = checkDate.getDay(); 
+            const dateStr = checkDate.toISOString().split('T')[0];
+            const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
+            if (dayOfWeek === 0 || isHoliday) { checkDate.setDate(checkDate.getDate() + 1); } 
+            else { isValid = true; }
+        }
+        return checkDate.toISOString().split('T')[0];
+    }
+
+    function saveBasket() { localStorage.setItem('oligo_basket', JSON.stringify(basket)); updateBadge(); }
+
+    window.navTo = (id) => {
+        ['viewHome', 'viewMenu', 'viewOrders', 'viewProfile', 'viewPayments', 'viewComplaints'].forEach(v => {
+            const el = document.getElementById(v); if(el) el.classList.add('hidden');
+            const mBtn = document.getElementById('nav-' + v); if(mBtn) mBtn.classList.remove('nav-active');
+            const dBtn = document.getElementById('desk-nav-' + v);
+            if(dBtn) { dBtn.classList.remove('nav-active', 'bg-green-50', 'text-green-700'); dBtn.classList.add('text-gray-600', 'hover:bg-gray-50'); }
+        });
+        
+        const target = document.getElementById(id);
+        if(target) target.classList.remove('hidden');
+        
+        const activeMNav = document.getElementById('nav-' + id); if(activeMNav) activeMNav.classList.add('nav-active');
+        const activeDNav = document.getElementById('desk-nav-' + id);
+        if(activeDNav) { activeDNav.classList.remove('text-gray-600', 'hover:bg-gray-50'); activeDNav.classList.add('nav-active', 'bg-green-50', 'text-green-700'); }
+        
+        window.scrollTo(0,0);
+        if(id === 'viewPayments') fetchPayments();
+    };
+
+    let toastTimeout;
+    window.showToast = (m, isError = false) => {
+        const t = document.getElementById('toast'); if(toastTimeout) clearTimeout(toastTimeout);
+        t.innerText = m;
+        t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-xs font-bold shadow-xl text-center transition-all duration-300 show ${isError ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`;
+        toastTimeout = setTimeout(() => { t.classList.remove('show'); }, 3000);
+    };
+
+    window.toggleRecovery = (show) => document.getElementById('recoveryModal').classList.toggle('hidden', !show);
+    window.sendResetLink = () => {
+        const email = document.getElementById('recInputEmail').value.trim();
+        if(!email) return window.showToast("Please enter your email", true);
+        sendPasswordResetEmail(auth, email).then(() => { window.showToast("Reset link sent!"); window.toggleRecovery(false); }).catch((err) => window.showToast(getFriendlyErrorMessage(err), true));
+    };
+
+    window.sendReferral = () => {
+        const email = document.getElementById('referralEmail').value.trim();
+        if (!email || !email.includes('@')) return window.showToast("Please enter a valid email", true);
+        push(ref(db, 'referrals'), { friendEmail: email, referredBy: auth.currentUser.uid, referredByName: userLocalData.name || "A User", timestamp: serverTimestamp() });
+        window.location.href = `mailto:${email}?subject=Invite to Oligo&body=Create your account here: ${window.location.href}`;
+        document.getElementById('referralEmail').value = ""; window.showToast("Invite drafted!");
+    };
+
+    function checkHolidayAlerts() {
+        const banner = document.getElementById('holidayAlertBanner'), msgEl = document.getElementById('holidayAlertMsg');
+        if(!banner || !msgEl) return;
+        const today = new Date();
+        for(let i=0; i<=4; i++) {
+            const checkDate = new Date(today); checkDate.setDate(today.getDate() + i);
+            const dateStr = checkDate.toISOString().split('T')[0];
+            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+            if(holiday) {
+                const formattedDate = checkDate.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'short' });
+                msgEl.innerHTML = `Farm closed on <strong>${formattedDate}</strong> for <strong>${holiday.name}</strong>.<br>Please plan your orders accordingly.`;
+                banner.classList.remove('hidden'); return;
+            }
+        }
+        banner.classList.add('hidden');
+    }
+
+    // --- SUBSCRIPTION LOGIC ---
+    window.toggleSubscriptionMode = () => {
+        const isSub = document.getElementById('subToggle').checked;
+        const oneTimeConfig = document.getElementById('oneTimeConfig');
+        const subConfig = document.getElementById('subConfig');
+        const btn = document.getElementById('orderBtn');
+        const subTotalNote = document.getElementById('subTotalNote');
+        
+        if (isSub) {
+            oneTimeConfig.classList.add('hidden');
+            subConfig.classList.remove('hidden');
+            btn.innerText = "Start Subscription";
+            btn.className = "w-full bg-blue-600 text-white py-5 rounded-[24px] font-bold shadow-xl shadow-blue-100 transition active:scale-[0.98]";
+            subTotalNote.classList.remove('hidden');
+            document.getElementById('deliveryFeeSection').classList.add('hidden');
+            document.getElementById('deliveryMessage').classList.add('hidden');
+        } else {
+            oneTimeConfig.classList.remove('hidden');
+            subConfig.classList.add('hidden');
+            btn.innerText = "Confirm Order (COD)";
+            btn.className = "w-full bg-green-600 text-white py-5 rounded-[24px] font-bold shadow-xl shadow-green-100 transition active:scale-[0.98]";
+            subTotalNote.classList.add('hidden');
+            calculateDeliveryLogic(document.getElementById('checkoutDate').value);
+        }
+    };
+
+    window.toggleDay = (btn, day) => {
+        btn.classList.toggle('selected');
+        if (selectedSubscriptionDays.includes(day)) {
+            selectedSubscriptionDays = selectedSubscriptionDays.filter(d => d !== day);
+        } else {
+            selectedSubscriptionDays.push(day);
+        }
+    };
+
+    window.openCart = () => { 
+        renderBasket(); 
+        const dateInput = document.getElementById('checkoutDate');
+        const validDateStr = getNextValidDeliveryDate();
+        
+        dateInput.min = validDateStr;
+        if(!dateInput.value || dateInput.value < validDateStr) { dateInput.value = validDateStr; }
+        
+        document.getElementById('subToggle').checked = false;
+        selectedSubscriptionDays = [];
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+        window.toggleSubscriptionMode();
+
+        const newDateInput = dateInput.cloneNode(true);
+        dateInput.parentNode.replaceChild(newDateInput, dateInput);
+        newDateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value); const dateStr = this.value;
+            if(selectedDate.getDay() === 0) { window.showToast("No deliveries on Sundays.", true); this.value = validDateStr; calculateDeliveryLogic(validDateStr); return; }
+            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+            if(holiday) { window.showToast(`Farm closed on ${dateStr} (${holiday.name}).`, true); this.value = validDateStr; calculateDeliveryLogic(validDateStr); return; }
+            calculateDeliveryLogic(dateStr);
+        });
+        calculateDeliveryLogic(newDateInput.value);
+        document.getElementById('cartModal').classList.remove('hidden'); 
+        
+        const count = basket.reduce((a, b) => a + b.qty, 0);
+        const deskBadge = document.getElementById('deskCartBadge');
+        if(deskBadge) { deskBadge.innerText = count; deskBadge.classList.toggle('hidden', count === 0); }
+    };
+    
+    function calculateDeliveryLogic(selectedDateStr) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const msgEl = document.getElementById('deliveryMessage');
+        const feeEl = document.getElementById('deliveryFeeDisplay');
+        const sectionEl = document.getElementById('deliveryFeeSection');
+        const totalEl = document.getElementById('cartTotal');
+        
+        let basketTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+        
+        currentDeliveryFee = 0;
+        currentDeliveryMethod = "Standard";
+        msgEl.innerText = "";
+        msgEl.className = "px-2 text-[10px] font-bold italic hidden";
+        sectionEl.classList.add('hidden');
+
+        if (selectedDateStr === todayStr) {
+            const now = new Date();
+            const timeVal = now.getHours() + (now.getMinutes() / 60);
+
+            if (timeVal < 8.0) {
+                msgEl.innerText = "Dispatch in 1st Batch (9:30 AM).";
+                msgEl.className = "px-2 text-[10px] font-bold italic text-green-600 block";
+            } else if (timeVal >= 8.0 && timeVal < 10.0) {
+                currentDeliveryFee = 80;
+                sectionEl.classList.remove('hidden');
+                feeEl.innerText = "+ ₹80";
+                msgEl.innerHTML = "<i class='fas fa-exclamation-circle'></i> Late Order: 2nd Batch (10:30 AM). Fee applied.";
+                msgEl.className = "px-2 text-[10px] font-bold italic text-orange-600 block";
+            } else if (timeVal >= 10.0) {
+                currentDeliveryMethod = "Porter";
+                msgEl.innerHTML = "<i class='fas fa-shipping-fast'></i> Late Order: Porter Delivery. <u>You pay driver directly.</u>";
+                msgEl.className = "px-2 text-[10px] font-bold italic text-red-600 block";
+            }
+        }
+        totalEl.innerText = "Box " + (basketTotal + currentDeliveryFee);
+    }
+
+    window.closeCart = () => {
+        document.getElementById('cartModal').classList.add('hidden');
+        editingOrderId = null;
+        document.getElementById('orderNote').value = ""; 
+    };
+
+    window.toggleAuth = (isReg) => {
+        document.getElementById('loginBox').classList.toggle('hidden', isReg);
+        document.getElementById('registerBox').classList.toggle('hidden', !isReg);
+        window.scrollTo(0,0);
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('authSection').classList.remove('flex');
+            document.getElementById('mainApp').classList.remove('hidden');
+            fetchUser(user.uid); 
+            fetchProducers(); 
+            fetchOrders(user.uid);
+            
+            onValue(ref(db, 'settings/holidays'), (snap) => { holidaysData = snap.val() || {}; checkHolidayAlerts(); });
+            
+            fetchModifications(user.uid);
+            fetchComplaints(user.uid);
+            
+            updateBadge();
+            const storedProd = localStorage.getItem('oligo_active_producer_id');
+            if(!storedProd) window.navTo('viewHome');
+        } else {
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('authSection').classList.add('flex');
+        }
+        document.getElementById('appLoader').style.display = 'none';
+    });
+
+    function fetchUser(uid) {
+        onValue(ref(db, 'customers/' + uid), (snap) => {
+            const data = snap.val() || {}; userLocalData = data;
+            
+            const firstName = data.name ? data.name.split(' ')[0] : "Guest";
+            
+            // Update Mobile Header (Detailed)
+            const mHeader = document.getElementById('headerUserName');
+            if(mHeader) mHeader.innerText = firstName;
+            
+            // Update Desktop Sidebar Greeting
+            const dHeader = document.getElementById('desktopUserName');
+            if(dHeader) dHeader.innerText = firstName;
+            
+            document.getElementById('profTitleName').innerText = data.name || "My Account";
+            document.getElementById('profName').value = data.name || "";
+            document.getElementById('profPhone').value = data.phone || "";
+            renderAddresses(); updateCheckoutSelect();
+        });
+    }
+    
+    // --- SUBSCRIPTION MODIFICATIONS ---
+    function fetchModifications(uid) {
+        onValue(ref(db, 'subscription_modifications'), (snap) => {
+            const data = snap.val() || {};
+            allModifications = {};
+            Object.entries(data).forEach(([key, mod]) => {
+                if(mod.customerUid === uid) {
+                    allModifications[key] = mod;
+                }
+            });
+            if(currentManagingSubId && !document.getElementById('subManageModal').classList.contains('hidden')) {
+                 const sub = allSubsData[currentManagingSubId];
+                 if(sub) {
+                     renderVisualCalendar(sub);
+                     renderModificationList();
+                 }
+            }
+        });
+    }
+
+    // --- PAYMENTS LOGIC ---
+    function fetchPayments() {
+        if (!userLocalData || !userLocalData.phone) return;
+        const phone = userLocalData.phone;
+        const historyList = document.getElementById('paymentHistoryList');
+        const statusContainer = document.getElementById('payStatusContainer');
+        const outstandingEl = document.getElementById('payTotalOutstanding');
+        
+        historyList.innerHTML = '<div class="text-center py-4 text-gray-400">Loading records...</div>';
+        
+        onValue(ref(db, 'receivables'), (snap) => {
+            const data = snap.val();
+            if (!data) {
+                renderNoPayments();
+                return;
+            }
+            
+            // Normalize phone for comparison if needed, here strict
+            const clientEntry = Object.values(data).find(c => c.phone === phone);
+            
+            if (clientEntry) {
+                const due = parseFloat(clientEntry.amountDue) || 0;
+                outstandingEl.innerText = "₹" + due.toLocaleString();
+                currentAmountDue = due;
+                const payBtn = document.getElementById('payNowBtn');
+                if (payBtn) payBtn.classList.toggle('hidden', due <= 0);
+                if (payBtn) payBtn.classList.toggle('flex', due > 0);
+                
+                const statusDetails = `
+                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
+                        <span class="text-xs text-gray-500">Status</span>
+                        <span class="text-xs font-bold text-gray-800">${clientEntry.status || 'Pending'}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
+                        <span class="text-xs text-gray-500">Last Ledger Date</span>
+                        <span class="text-xs font-bold text-gray-800">${clientEntry.lastUpdated ? new Date(clientEntry.lastUpdated).toLocaleDateString() : '-'}</span>
+                    </div>
+                `;
+                statusContainer.innerHTML = statusDetails;
+                
+                const logs = clientEntry.logs ? Object.values(clientEntry.logs).sort((a,b) => b.timestamp - a.timestamp) : [];
+
+                // Paid vs Pending split
+                const totalPaid = logs.reduce((sum, l) => sum + (parseFloat(l.received) || 0), 0);
+                const splitRow = document.getElementById('paySplitRow');
+                if (splitRow) {
+                    splitRow.classList.remove('hidden');
+                    splitRow.classList.add('grid');
+                    document.getElementById('payTotalPaid').innerText = "₹" + totalPaid.toLocaleString();
+                    document.getElementById('payTotalPending').innerText = "₹" + due.toLocaleString();
+                }
+
+                if (logs.length === 0) {
+                    historyList.innerHTML = emptyStateHTML('fa-receipt', 'No transactions yet', 'Payments and charges will appear here as they happen.');
+                } else {
+                    historyList.innerHTML = logs.map(l => {
+                        const isPayment = (parseFloat(l.received) || 0) > 0;
+                        const icon = isPayment ? 'fa-arrow-down text-green-500' : 'fa-info-circle text-blue-500';
+                        const amountDisplay = isPayment ? `<span class="font-bold text-green-600">+₹${l.received}</span>` : '';
+                        const noteText = l.note && l.note.trim() ? l.note : (isPayment ? 'Payment received' : 'Ledger update');
+                        
+                        return `
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-gray-700">${new Date(l.timestamp).toLocaleDateString()}</p>
+                                    <p class="text-[10px] text-gray-500">${noteText}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                ${amountDisplay}
+                                <p class="text-[9px] text-gray-400 uppercase">${l.status}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+                
+            } else {
+                renderNoPayments();
+            }
+        });
+    }
+    
+    function renderNoPayments() {
+        document.getElementById('payTotalOutstanding').innerText = "₹0";
+        document.getElementById('payStatusContainer').innerHTML = '<p class="text-xs text-gray-400">No active ledger found linked to your phone number.</p>';
+        document.getElementById('paymentHistoryList').innerHTML = emptyStateHTML('fa-receipt', 'No records found', 'Nothing to show here yet.');
+        const splitRow = document.getElementById('paySplitRow');
+        if (splitRow) { splitRow.classList.add('hidden'); splitRow.classList.remove('grid'); }
+        currentAmountDue = 0;
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) { payBtn.classList.add('hidden'); payBtn.classList.remove('flex'); }
+    }
+
+    // --- PAY NOW (UPI DEEP LINK) ---
+    // Builds a standard upi://pay link (works with GPay, PhonePe, Paytm, etc. on
+    // mobile). OLIGO_UPI_ID is a placeholder near the top of this script —
+    // replace it with the real VPA before going live.
+    window.payNow = () => {
+        if (!currentAmountDue || currentAmountDue <= 0) return window.showToast("No outstanding amount to pay.", true);
+        const note = encodeURIComponent("Oligo payment - " + (userLocalData?.name || "Customer"));
+        const payeeName = encodeURIComponent(OLIGO_UPI_PAYEE_NAME);
+        const upiUrl = `upi://pay?pa=${OLIGO_UPI_ID}&pn=${payeeName}&am=${currentAmountDue}&cu=INR&tn=${note}`;
+        window.location.href = upiUrl;
+    };
+
+    // --- COMPLAINTS LOGIC ---
+    window.submitComplaint = async () => {
+        const desc = document.getElementById('complaintDesc').value.trim();
+        const files = document.getElementById('complaintImages').files;
+        
+        if (!desc && files.length === 0) return window.showToast("Please add details or images", true);
+        
+        let imageUrls = [];
+        if (files.length > 0) {
+            for (let i = 0; i < Math.min(files.length, 3); i++) {
+                const file = files[i];
+                const storageRef = sRef(storage, `complaint_images/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
+                try {
+                    await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(storageRef);
+                    imageUrls.push(url);
+                } catch(e) { console.error(e); }
+            }
+        }
+        
+        push(ref(db, 'complaints'), {
+            customerUid: auth.currentUser.uid,
+            customerName: userLocalData.name || 'User',
+            description: desc,
+            images: imageUrls,
+            status: 'PENDING',
+            createdAt: serverTimestamp()
+        }).then(() => {
+            window.showToast("Complaint Submitted");
+            document.getElementById('complaintDesc').value = "";
+            document.getElementById('complaintImages').value = "";
+        }).catch(e => window.showToast("Error submitting", true));
+    };
+
+    // --- COMPLAINTS HISTORY ---
+    // Reads the same 'complaints' node the production/admin app writes resolution
+    // status back to. We don't know the exact admin-side field name for the
+    // resolution note, so we check a few common ones (resolution, adminNote,
+    // adminResponse, resolutionNote, response) and show whichever is present.
+    let _myComplaintsAll = [];
+
+    function fetchComplaints(uid) {
+        onValue(ref(db, 'complaints'), (snap) => {
+            const data = snap.val();
+            const mine = data ? Object.entries(data)
+                .filter(([_, c]) => c.customerUid === uid)
+                .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
+                .map(([id, c]) => ({ id, ...c })) : [];
+            _myComplaintsAll = mine;
+            window.filterMyComplaints(_currentComplaintFilter || 'all');
+        });
+    }
+
+    let _currentComplaintFilter = 'all';
+    window.filterMyComplaints = (filter) => {
+        _currentComplaintFilter = filter;
+        ['all', 'open', 'resolved'].forEach(f => {
+            const btn = document.getElementById('cf-' + f);
+            if (!btn) return;
+            if (f === filter) { btn.classList.add('bg-white', 'shadow', 'text-gray-800'); btn.classList.remove('text-gray-500'); }
+            else { btn.classList.remove('bg-white', 'shadow', 'text-gray-800'); btn.classList.add('text-gray-500'); }
+        });
+
+        const list = filter === 'open'
+            ? _myComplaintsAll.filter(c => (c.status || 'PENDING').toUpperCase() !== 'RESOLVED')
+            : filter === 'resolved'
+                ? _myComplaintsAll.filter(c => (c.status || '').toUpperCase() === 'RESOLVED')
+                : _myComplaintsAll;
+
+        const container = document.getElementById('complaintsList');
+        if (!container) return;
+        if (list.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-300 py-6 text-sm">No complaints in this category.</p>';
+            return;
+        }
+        container.innerHTML = list.map(c => renderComplaintCard(c.id, c)).join('');
+    };
+
+    function renderComplaintCard(id, c) {
+        const status = (c.status || 'PENDING').toUpperCase();
+        const isResolved = status === 'RESOLVED';
+        const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+        const statusBadge = isResolved
+            ? '<span class="text-[10px] font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Resolved</span>'
+            : status === 'IN_PROGRESS'
+                ? '<span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">In Progress</span>'
+                : '<span class="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">Pending</span>';
+
+        const imagesHtml = (c.images && c.images.length > 0)
+            ? `<div class="flex gap-2 mt-2">${c.images.map(url => `<a href="${url}" target="_blank" rel="noopener"><img src="${url}" class="w-12 h-12 object-cover rounded-lg border border-gray-200"></a>`).join('')}</div>`
+            : '';
+
+        // Check several possible admin-response field names since the exact
+        // field written by the production app's resolution flow isn't confirmed.
+        const resolutionText = c.resolution || c.adminNote || c.adminResponse || c.resolutionNote || c.response || '';
+
+        let replyBlock = '';
+        if (isResolved && resolutionText) {
+            replyBlock = `<div class="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
+                <p class="text-[10px] font-bold text-green-600 uppercase mb-1"><i class="fas fa-reply mr-1"></i>Response from Oligo</p>
+                <p class="text-xs text-gray-700">${resolutionText}</p>
+            </div>`;
+        } else if (!isResolved) {
+            replyBlock = `<div class="mt-3 bg-orange-50 border border-orange-100 rounded-xl p-3">
+                <p class="text-[10px] text-orange-500 font-medium"><i class="fas fa-clock mr-1"></i>Our team is reviewing your complaint. We'll get back to you shortly.</p>
+            </div>`;
+        }
+
+        return `<div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <div class="flex justify-between items-start mb-1">
+                <p class="text-sm font-bold text-gray-800">#${id.slice(-6)}</p>
+                ${statusBadge}
+            </div>
+            ${c.description ? `<p class="text-xs text-gray-500 mb-1 italic">"${c.description}"</p>` : ''}
+            <p class="text-[10px] text-gray-300">${dateStr}</p>
+            ${imagesHtml}
+            ${replyBlock}
+        </div>`;
+    }
+
+    window.updateProfile = () => {
+        const name = document.getElementById('profName').value.trim();
+        const phone = document.getElementById('profPhone').value.trim();
+        if(!name) return window.showToast("Full name required", true);
+        if(!phone) return window.showToast("Phone required", true);
+        set(ref(db, `customers/${auth.currentUser.uid}/name`), name);
+        set(ref(db, `customers/${auth.currentUser.uid}/phone`), phone).then(() => window.showToast("Profile Updated"));
+    };
+
+    window.toggleAddrForm = () => document.getElementById('addrForm').classList.toggle('hidden');
+    window.saveNewAddress = () => {
+        const joint = document.getElementById('newJointName').value.trim();
+        const loc = document.getElementById('newLocName').value.trim();
+        const full = document.getElementById('newFullAddr').value.trim();
+        if(!joint || !loc || !full) return window.showToast("All address fields required", true);
+        push(ref(db, `customers/${auth.currentUser.uid}/addresses`), { jointName: joint, location: loc, fullAddress: full }).then(() => {
+            document.getElementById('newJointName').value = ""; document.getElementById('newLocName').value = ""; document.getElementById('newFullAddr').value = ""; 
+            toggleAddrForm(); window.showToast("Address Saved");
+        });
+    };
+    window.deleteAddr = (id) => { if(confirm("Remove this address?")) remove(ref(db, `customers/${auth.currentUser.uid}/addresses/${id}`)); };
+
+    function renderAddresses() {
+        const list = document.getElementById('addressList'); const addrs = userLocalData.addresses || {};
+        if(Object.keys(addrs).length === 0) { list.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center col-span-2 italic">No locations saved.</p>`; return; }
+        list.innerHTML = Object.entries(addrs).map(([id, a]) => `
+            <div class="p-5 flex justify-between items-center bg-white border border-gray-100 group transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-sm"><i class="fas fa-building"></i></div>
+                    <div class="overflow-hidden"><p class="text-xs font-bold text-green-600 uppercase truncate">${a.jointName}</p><p class="text-sm font-bold text-gray-800 uppercase truncate">${a.location}</p><p class="text-[11px] text-gray-400 mt-0.5 truncate">${a.fullAddress}</p></div>
+                </div>
+                <button onclick="window.deleteAddr('${id}')" class="text-gray-300 hover:text-red-500 p-2"><i class="fas fa-trash-alt text-xs"></i></button>
+            </div>`).join('');
+    }
+
+    function updateCheckoutSelect() {
+        const sel = document.getElementById('checkoutAddrSelect'); const addrs = userLocalData.addresses || {};
+        sel.innerHTML = '<option value="">-- Choose saved address --</option>';
+        Object.values(addrs).forEach(a => { sel.innerHTML += `<option value="${a.jointName} - ${a.location}: ${a.fullAddress}">${a.jointName} (${a.location})</option>`; });
+    }
+
+    function fetchProducers() {
+        onValue(ref(db, 'Production'), (snap) => {
+            const list = document.getElementById('producersList'); list.innerHTML = ''; const data = snap.val(); if(!data) return;
+            Object.entries(data).forEach(([id, p]) => {
+                if(p.approved) list.innerHTML += `<div onclick="window.openMenu('${id}', '${p.name}', '${p.cuisine}')" class="bg-white p-5 rounded-[32px] shadow-sm flex items-center gap-4 border border-gray-100 product-card cursor-pointer"><div class="bg-green-100 w-16 h-16 rounded-3xl flex items-center justify-center text-green-600 text-2xl shadow-inner"><i class="fas fa-leaf"></i></div><div class="flex-1"><h3 class="font-bold text-lg text-gray-800">${p.name}</h3><p class="text-xs text-gray-400">${p.cuisine || 'Fresh Harvest'}</p></div><i class="fas fa-chevron-right text-gray-200"></i></div>`;
+            });
+        });
+    }
+
+    window.openMenu = (id, name, cuisine) => {
+        const currentId = localStorage.getItem('oligo_active_producer_id');
+        if(currentId && currentId !== id && basket.length > 0) { if(!confirm("Empty basket? You are switching farms.")) return; basket = []; saveBasket(); }
+        localStorage.setItem('oligo_active_producer_id', id); localStorage.setItem('oligo_active_producer_name', name);
+        document.getElementById('menuTitle').innerText = name; window.navTo('viewMenu');
+        onValue(ref(db, 'menus/' + id), (snap) => { menuData = snap.val() || {}; renderCatBar(); renderMenuItems('All'); });
+    };
+
+    function renderCatBar() {
+        const bar = document.getElementById('categoryBar'); const cats = ['All', 'Microgreens', 'Live Trays', 'Mix Microgreens', 'Edible Flowers', 'Baby Leaves', 'Wheatgrass'];
+        bar.innerHTML = cats.map(c => `<button onclick="window.renderMenuItems('${c}')" id="catBtn-${c.replace(/\s+/g,'')}" class="cat-pill">${c}</button>`).join('');
+    }
+
+    window.renderMenuItems = (cat) => {
+        const list = document.getElementById('menuList'); list.innerHTML = '';
+        document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById('catBtn-' + cat.replace(/\s+/g,'')); if(btn) btn.classList.add('active');
+
+        Object.entries(menuData).forEach(([id, item]) => {
+            if(!item.available) return; if(cat !== 'All' && item.category !== cat) return;
+            list.innerHTML += `<div class="bg-white p-5 rounded-[32px] flex gap-5 items-center border border-gray-50 shadow-sm product-card"><div class="flex-1"><h4 class="font-bold text-lg text-gray-800">${item.name}</h4><p class="text-[11px] text-gray-500 mt-1">${item.description || 'Fresh harvest.'}</p><div class="flex justify-between items-center mt-3"><span class="font-bold text-green-700 text-lg">Box ${item.price}</span><button onclick="window.addToBasket('${id}', '${item.name}', '${item.price}', '${item.category || ''}')" class="bg-green-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md active:scale-90 transition">ADD</button></div></div></div>`;
+        });
+    };
+
+    window.addToBasket = (id, name, price, category) => {
+        const ex = basket.find(i => i.id === id); if(ex) ex.qty++; else basket.push({ id, name, price: parseFloat(price), category, qty: 1 });
+        saveBasket(); window.showToast("Added to basket");
+    };
+
+    function updateBadge() { 
+        const count = basket.reduce((a, b) => a + b.qty, 0); 
+        const b = document.getElementById('cartBadge'); b.innerText = count; b.classList.toggle('hidden', count === 0);
+        const d = document.getElementById('deskCartBadge'); if(d) { d.innerText = count; d.classList.toggle('hidden', count === 0); }
+    }
+
+    function renderBasket() {
+        const list = document.getElementById('cartItems'), totalEl = document.getElementById('cartTotal'); let total = 0;
+        if(basket.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10 font-medium">Your basket is empty</p>`; totalEl.innerText = "Box 0"; return; }
+        list.innerHTML = basket.map((item, idx) => {
+            total += (item.price * item.qty);
+            return `<div class="flex justify-between items-center bg-gray-50 p-5 rounded-2xl border border-gray-100"><div><p class="font-bold text-sm text-gray-800">${item.name}</p><p class="text-[10px] text-green-600 font-bold">Qty: ${item.qty}</p></div><div class="flex items-center gap-3"><button onclick="window.changeQty(${idx}, -1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">-</button><span class="font-bold text-sm text-gray-800">${item.qty}</span><button onclick="window.changeQty(${idx}, 1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">+</button></div></div>`;
+        }).join('');
+        const dateIn = document.getElementById('checkoutDate').value;
+        if(dateIn) calculateDeliveryLogic(dateIn);
+        if(document.getElementById('subToggle').checked) totalEl.innerText = "Box " + total;
+    }
+
+    window.changeQty = (idx, d) => { basket[idx].qty += d; if(basket[idx].qty <= 0) basket.splice(idx, 1); saveBasket(); renderBasket(); };
+
+    window.placeOrder = () => {
+        try {
+            if(!userLocalData || !userLocalData.phone) { window.showToast("Phone required.", true); window.closeCart(); window.navTo('viewProfile'); return; }
+            if (basket.length === 0) return window.showToast("Basket empty.", true);
+            const activeProducerId = localStorage.getItem('oligo_active_producer_id');
+            const addr = document.getElementById('checkoutAddrSelect').value;
+            if(!addr) return window.showToast("Select address.", true);
+            const note = document.getElementById('orderNote').value.trim();
+            const itemsTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+            const isSubscription = document.getElementById('subToggle').checked;
+
+            if (isSubscription) {
+                if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
+                const duration = document.getElementById('subDuration').value;
+                
+                // 1. Create Subscription Record
+                const subData = { 
+                    customerUid: auth.currentUser.uid, 
+                    customerName: userLocalData.name || "Guest", 
+                    customerPhone: userLocalData.phone,
+                    restaurantId: activeProducerId,
+                    items: basket,
+                    totalPerDelivery: itemsTotal,
+                    address: addr,
+                    frequency: selectedSubscriptionDays,
+                    duration: duration,
+                    customerNote: note,
+                    status: "ACTIVE", 
+                    sourceApp: "customer-sub-final",
+                    createdAt: serverTimestamp() 
+                };
+                
+                // Push the subscription first so we get its key — every order generated
+                // from this subscription (this first one, and every future daily one
+                // created by the production app) can then be traced back to it via
+                // subscriptionId, and identified as a subscription order via
+                // isSubscriptionOrder. Keeping these two field names consistent across
+                // both apps is what makes future reports (order counts, variety sales,
+                // packing material usage) possible to build directly off the orders node.
+                const subRef = push(ref(db, 'subscriptions'), subData);
+                const subKey = subRef.key;
+
+                // 2. Create the FIRST Immediate Order Record (So Production sees it)
+                const firstOrderData = {
+                    customerUid: auth.currentUser.uid,
+                    customerName: userLocalData.name || "Guest",
+                    customerPhone: userLocalData.phone,
+                    restaurantId: activeProducerId,
+                    items: basket,
+                    totalAmount: itemsTotal + currentDeliveryFee, // Include fee if applicable
+                    deliveryFee: currentDeliveryFee,
+                    deliveryMethod: currentDeliveryMethod,
+                    address: addr,
+                    requestedDate: getNextSubscriptionDate(selectedSubscriptionDays), // Use new logic
+                    customerNote: note + " (First Order of Subscription)", 
+                    status: "PLACED",
+                    isSubscriptionOrder: true, // Tag it — kept consistent with production app's daily-accept flow
+                    subscriptionId: subKey, // Links this order back to its parent subscription
+                    sourceApp: "customer-sub-final",
+                    createdAt: serverTimestamp()
+                };
+
+                // Save the first order (subscription itself is already saved above)
+                Promise.all([
+                    subRef,
+                    push(ref(db, 'orders'), firstOrderData)
+                ]).then(() => { 
+                    basket = []; 
+                    saveBasket(); 
+                    window.closeCart(); 
+                    window.navTo('viewOrders'); 
+                    window.switchOrderView('subs'); 
+                    window.showToast("Subscription & First Order Placed!"); 
+                });
+            } else {
+                const reqDate = document.getElementById('checkoutDate').value;
+                if(!reqDate) return window.showToast("Select date.", true);
+                const grandTotal = itemsTotal + currentDeliveryFee;
+                const orderData = { customerUid: auth.currentUser.uid, customerName: userLocalData.name || "Guest", customerPhone: userLocalData.phone, restaurantId: activeProducerId, items: basket, totalAmount: grandTotal, deliveryFee: currentDeliveryFee, deliveryMethod: currentDeliveryMethod, address: addr, requestedDate: reqDate, customerNote: note, status: "PLACED", sourceApp: "customer-sub-final", createdAt: serverTimestamp() };
+                if(editingOrderId) { delete orderData.createdAt; orderData.updatedAt = serverTimestamp(); set(ref(db, 'orders/' + editingOrderId), orderData).then(successHandler); } else { push(ref(db, 'orders'), orderData).then(successHandler); }
+            }
+            function successHandler() { basket = []; saveBasket(); window.closeCart(); window.navTo('viewOrders'); window.switchOrderView('history'); window.showToast(editingOrderId ? "Order Updated" : "Order Placed"); editingOrderId = null; }
+        } catch(e) { window.showToast("Error", true); }
+    };
+
+    window.switchOrderView = (view) => {
+        const ordersDiv = document.getElementById('ordersList'), subsDiv = document.getElementById('subsList'), btnHistory = document.getElementById('tab-btn-history'), btnSubs = document.getElementById('tab-btn-subs');
+        if (view === 'history') { ordersDiv.classList.remove('hidden'); subsDiv.classList.add('hidden'); btnHistory.classList.add('active'); btnSubs.classList.remove('active'); } 
+        else { ordersDiv.classList.add('hidden'); subsDiv.classList.remove('hidden'); btnSubs.classList.add('active'); btnHistory.classList.remove('active'); }
+    }
+
+    // --- SUBSCRIPTION MANAGEMENT FUNCTIONS ---
+    window.manageSubscription = (subId) => {
+        const sub = allSubsData[subId];
+        if(!sub) return;
+        currentManagingSubId = subId;
+        
+        document.getElementById('subManageId').innerText = `ID: #${subId.slice(-6)}`;
+        document.getElementById('subStatusBadge').innerText = sub.status;
+        document.getElementById('subStatusBadge').className = `text-xs font-bold px-2 py-0.5 rounded-full ${sub.status === 'ACTIVE' ? 'text-blue-700 bg-white' : 'text-red-700 bg-white'}`;
+        
+        let totalDrops = 0;
+        const freq = sub.frequency ? sub.frequency.length : 0;
+        if(sub.duration === '4 Weeks') totalDrops = freq * 4;
+        else if(sub.duration === '12 Weeks') totalDrops = freq * 12;
+        else totalDrops = 99;
+        
+        let deliveredCount = 0; 
+        const progress = totalDrops > 0 ? (deliveredCount / totalDrops) * 100 : 0;
+        
+        document.getElementById('subTotalDeliveries').innerText = `${deliveredCount}/${totalDrops > 90 ? '∞' : totalDrops}`;
+        document.getElementById('subProgressBar').style.width = `${progress}%`;
+        
+        const start = new Date(sub.createdAt);
+        document.getElementById('subStartDate').innerText = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        let endDate = "-";
+        if(sub.duration !== 'Until Cancelled') {
+            const weeks = parseInt(sub.duration.split(' ')[0]);
+            const end = new Date(start);
+            end.setDate(start.getDate() + (weeks * 7));
+            endDate = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        document.getElementById('subEndDate').innerText = endDate;
+
+        const list = document.getElementById('subItemsList');
+        list.innerHTML = sub.items.map(i => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs"><span class="font-medium text-gray-700">${i.name}</span><span class="font-bold text-gray-900">x${i.qty}</span></div>`).join('');
+
+        document.getElementById('vacationDate').value = "";
+        document.getElementById('newDeliveryDate').value = "";
+        
+        // Reset Visual Calendar
+        currentVisualMonth = new Date().getMonth();
+        currentVisualYear = new Date().getFullYear();
+        renderVisualCalendar(sub);
+        
+        // Render Active Modifications List
+        renderModificationList();
+        
+        // Set default target input
+        window.setTargetInput('vacationDate');
+
+        document.getElementById('subManageModal').classList.remove('hidden');
+    };
+    
+    // --- CUSTOM CALENDAR LOGIC ---
+    function renderVisualCalendar(sub) {
+        const cal = document.getElementById('visualCalendar');
+        const monthLabel = document.getElementById('calMonthYear');
+        cal.innerHTML = '';
+        
+        const firstDay = new Date(currentVisualYear, currentVisualMonth, 1);
+        const lastDay = new Date(currentVisualYear, currentVisualMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startDayOfWeek = firstDay.getDay(); 
+        
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        monthLabel.innerText = `${monthNames[currentVisualMonth]} ${currentVisualYear}`;
+
+        // Calculate Subscription Range
+        const startDate = new Date(sub.createdAt);
+        startDate.setHours(0,0,0,0);
+        
+        let endDate = null;
+        if (sub.duration !== 'Until Cancelled') {
+            const weeks = parseInt(sub.duration);
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + (weeks * 7));
+            endDate.setHours(23,59,59,999);
+        }
+
+        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
+
+        for(let i=0; i<startDayOfWeek; i++) { cal.innerHTML += `<div class="cal-day empty"></div>`; }
+        
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateObj = new Date(currentVisualYear, currentVisualMonth, d);
+            const dayOfWeekIndex = dateObj.getDay(); 
+            const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const dayName = dayNamesShort[dayOfWeekIndex];
+            
+            const year = currentVisualYear;
+            const month = String(currentVisualMonth + 1).padStart(2, '0');
+            const day = String(d).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
+            let classList = "cal-day normal";
+            let clickAction = "";
+
+            // Check Range
+            const isBeforeStart = dateObj < startDate;
+            const isAfterEnd = endDate && dateObj > endDate;
+
+            if (isBeforeStart || isAfterEnd) {
+                classList = "cal-day out-of-range"; 
+            } else {
+                // Within Range Logic
+                const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
+                const isSunday = (dayOfWeekIndex === 0);
+                const isSkipped = subMods.some(m => m.skipDate === dateStr);
+                const isAdded = subMods.some(m => m.moveDate === dateStr);
+
+                if(isHoliday || isSunday) {
+                    classList = "cal-day holiday";
+                } else if (isSkipped) {
+                    classList = "cal-day skipped";
+                } else if (isAdded) {
+                    classList = "cal-day added";
+                } else {
+                    clickAction = `onclick="window.selectCalDate('${dateStr}')"`;
+                    if (sub.frequency && sub.frequency.includes(dayName)) {
+                        classList = "cal-day delivery";
+                    } else {
+                        classList = "cal-day normal";
+                    }
+                }
+            }
+            cal.innerHTML += `<div class="${classList}" ${clickAction}>${d}</div>`;
+        }
+    }
+    
+    // --- Render List of Modifications ---
+    function renderModificationList() {
+        const container = document.getElementById('activeModificationsList');
+        container.innerHTML = '';
+        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
+        
+        if(subMods.length > 0) {
+            container.innerHTML = '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Pending / Active Changes</p>';
+            subMods.forEach(m => {
+                let statusColor = m.status === 'APPROVED' ? 'text-green-600' : 'text-orange-600';
+                let moveText = m.moveDate && m.moveDate.includes('Skip') ? 'Skipped' : `Moved to ${new Date(m.moveDate).toLocaleDateString()}`;
+                const skipDisplay = !isNaN(new Date(m.skipDate).getTime()) ? new Date(m.skipDate).toLocaleDateString() : m.skipDate;
+
+                container.innerHTML += `
+                    <div class="bg-white border border-gray-100 p-2 rounded-lg text-xs flex justify-between items-center mb-1">
+                        <div>
+                            <span class="text-red-500 font-bold line-through mr-1">${skipDisplay}</span>
+                            <i class="fas fa-arrow-right text-gray-300 mx-1"></i>
+                            <span class="font-bold text-gray-700">${moveText}</span>
+                        </div>
+                        <span class="${statusColor} font-bold text-[9px] uppercase">${(m.status || 'PENDING').replace('_', ' ')}</span>
+                    </div>
+                `;
+            });
+        }
+    }
+    
+    window.changeCalMonth = (delta) => {
+        currentVisualMonth += delta;
+        if(currentVisualMonth > 11) { currentVisualMonth = 0; currentVisualYear++; }
+        else if(currentVisualMonth < 0) { currentVisualMonth = 11; currentVisualYear--; }
+        const sub = allSubsData[currentManagingSubId];
+        if(sub) renderVisualCalendar(sub);
+    };
+    
+    // Set Active Input Target
+    window.setTargetInput = (id) => {
+        targetInputId = id;
+        document.getElementById('vacationDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
+        document.getElementById('newDeliveryDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
+        document.getElementById(id).classList.add('ring-2', 'ring-orange-400', 'border-orange-500');
+    };
+    
+    window.selectCalDate = (dateStr) => {
+        const input = document.getElementById(targetInputId);
+        if(input) {
+            input.value = dateStr;
+            if(targetInputId === 'vacationDate') window.validateVacationDate(input);
+        }
+    };
+
+    window.closeSubManage = () => {
+        document.getElementById('subManageModal').classList.add('hidden');
+        currentManagingSubId = null;
+    };
+
+    window.validateVacationDate = (input) => {
+        const dateStr = input.value;
+        if(!dateStr) return;
+        const d = new Date(dateStr);
+        if(d.getDay() === 0) { window.showToast("Sundays are closed.", true); input.value = ""; return; }
+        const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+        if(holiday) { window.showToast(`Farm closed: ${holiday.name}`, true); input.value = ""; return; }
+    };
+
+    window.submitReschedule = () => {
+        const skip = document.getElementById('vacationDate').value;
+        const move = document.getElementById('newDeliveryDate').value;
+        if(!skip) return window.showToast("Select a date to skip", true);
+        const payload = { subscriptionId: currentManagingSubId, customerUid: auth.currentUser.uid, customerName: userLocalData.name, skipDate: skip, moveDate: move || "Skipped (No Reschedule)", status: "PENDING_REVIEW", createdAt: serverTimestamp() };
+        push(ref(db, 'subscription_modifications'), payload).then(() => { window.showToast("Request Sent to Admin"); window.closeSubManage(); }).catch(e => window.showToast("Error sending request", true));
+    };
+
+    // --- NEW: Cancel Subscription Logic ---
+    window.cancelSubscription = () => {
+        if(!currentManagingSubId) return;
+        if(confirm("Stop this subscription? Future orders will not be generated.")) {
+            update(ref(db, 'subscriptions/' + currentManagingSubId), { status: 'CANCELLED' })
+            .then(() => {
+                 window.showToast("Subscription Cancelled");
+                 window.closeSubManage();
+            });
+        }
+    };
+    
+    window.deleteSub = (subId) => {
+        if(confirm("Remove this subscription record permanently?")) {
+            remove(ref(db, 'subscriptions/' + subId)).then(() => window.showToast("Record Deleted"));
+        }
+    };
+
+    function orderSkeletonHTML(n) {
+        let out = '';
+        for (let i = 0; i < n; i++) {
+            out += `<div class="skel-card"><div class="flex justify-between items-start mb-4"><div class="space-y-2"><div class="skel" style="width:80px;height:9px;"></div><div class="skel" style="width:120px;height:20px;"></div></div><div class="skel" style="width:60px;height:20px;border-radius:99px;"></div></div><div class="skel" style="width:100%;height:14px;"></div></div>`;
+        }
+        return out;
+    }
+
+    function emptyStateHTML(icon, title, subtitle) {
+        return `<div class="empty-state lg:col-span-2"><div class="icon-wrap"><i class="fas ${icon}"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">${title}</h4><p class="text-xs text-gray-400">${subtitle}</p></div>`;
+    }
+
+    function itemChipsHTML(items) {
+        return (items || []).map(i => `<span class="item-chip">${i.qty}× ${i.name}</span>`).join('');
+    }
+
+    function fetchOrders(uid) {
+        document.getElementById('ordersList').innerHTML = orderSkeletonHTML(3);
+        document.getElementById('subsList').innerHTML = orderSkeletonHTML(2);
+
+        onValue(ref(db, 'orders'), (snap) => {
+            const list = document.getElementById('ordersList'); list.innerHTML = ''; 
+            const data = snap.val(); allOrdersData = data || {}; 
+            const myOrders = data ? Object.entries(data).filter(([_, o]) => o.customerUid === uid).sort((a,b) => b[1].createdAt - a[1].createdAt) : [];
+
+            if (myOrders.length === 0) {
+                list.innerHTML = emptyStateHTML('fa-basket-shopping', 'No orders yet', 'Your one-time orders will show up here once placed.');
+                return;
+            }
+
+            myOrders.forEach(([id, o]) => {
+                const statusColor = o.status === 'PLACED' ? 'bg-blue-100 text-blue-600' : (o.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : (o.status === 'CANCELLED' ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-500'));
+                const cancelBtn = o.status === 'PLACED'
+                    ? `<button onclick="window.cancelOrder('${id}')" class="action-btn bg-red-50 text-red-500">Cancel</button>`
+                    : '';
+                list.innerHTML += `<div class="modern-card p-6 border border-gray-100">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-400">${new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                            <span class="text-[9px] text-gray-300 font-mono tracking-widest uppercase">#${id.slice(-6)}</span>
+                        </div>
+                        <span class="status-badge ${statusColor}">${o.status}</span>
+                    </div>
+                    <div class="mb-3">${itemChipsHTML(o.items)}</div>
+                    <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+                        <div><span class="text-[10px] text-gray-400 uppercase font-bold block">Total</span><span class="font-bold text-xl text-gray-800">₹${o.totalAmount}</span></div>
+                        <div class="flex gap-2">${cancelBtn}<button onclick="window.repeatOrder('${id}')" class="action-btn bg-green-50 text-green-600"><i class="fas fa-rotate-right mr-1.5"></i>Repeat</button></div>
+                    </div>
+                </div>`;
+            });
+        });
+
+        onValue(ref(db, 'subscriptions'), (snap) => {
+            const list = document.getElementById('subsList'); list.innerHTML = '';
+            const data = snap.val(); allSubsData = data || {};
+            const mySubs = data ? Object.entries(data).filter(([_, s]) => s.customerUid === uid) : [];
+
+            if (mySubs.length === 0) {
+                list.innerHTML = emptyStateHTML('fa-calendar-check', 'No active subscriptions', 'Set up a recurring delivery from the Home tab to save time.');
+                return;
+            }
+
+            mySubs.forEach(([id, s]) => {
+                const statusColor = s.status === 'ACTIVE' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700';
+                const daysStr = s.frequency ? s.frequency.join(', ') : '';
+                const nextDate = (s.status === 'ACTIVE' && s.frequency && s.frequency.length) ? getNextSubscriptionDate(s.frequency) : null;
+                const nextDateStr = nextDate ? new Date(nextDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : null;
+
+                const deleteBtn = s.status === 'CANCELLED' 
+                    ? `<button onclick="window.deleteSub('${id}')" class="text-red-400 hover:text-red-600 ml-2" title="Delete Record"><i class="fas fa-trash"></i></button>` 
+                    : '';
+
+                list.innerHTML += `<div class="modern-card p-6 border border-blue-50 bg-blue-50/20">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-[9px] text-blue-300 font-bold uppercase tracking-widest">Subscription</span>
+                            <p class="text-xs font-bold text-gray-700 mt-1"><i class="fas fa-truck-fast text-blue-400 mr-1.5"></i>Delivers: ${daysStr}</p>
+                            <p class="text-[11px] text-gray-500">${s.duration}</p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="status-badge ${statusColor}">${s.status}</span>${deleteBtn}
+                        </div>
+                    </div>
+                    ${nextDateStr ? `<div class="mb-3 bg-white border border-blue-100 rounded-xl px-3 py-2 text-[11px] font-bold text-blue-700"><i class="fas fa-clock mr-1.5"></i>Next delivery: ${nextDateStr}</div>` : ''}
+                    <div class="mb-3">${itemChipsHTML(s.items)}</div>
+                    <div class="flex justify-between items-center pt-3 border-t border-blue-100/60">
+                        <button onclick="window.manageSubscription('${id}')" class="action-btn text-blue-600 bg-white border border-blue-200 shadow-sm">Manage / Reschedule</button>
+                        <span class="font-bold text-gray-800 text-sm">₹${s.totalPerDelivery} / drop</span>
+                    </div>
+                </div>`;
+            });
+        });
+    }
+
+    // --- EDIT & REPEAT ORDER ---
+    window.editOrder = (orderId) => {
+        const order = allOrdersData[orderId];
+        if (!order || order.status !== 'PLACED') return window.showToast("Cannot edit.", true);
+        localStorage.setItem('oligo_active_producer_id', order.restaurantId);
+        basket = order.items.map(i => ({...i, price: parseFloat(i.price)}));
+        saveBasket(); window.openCart(); editingOrderId = orderId; 
+        document.getElementById('orderBtn').innerText = "Update Order";
+        document.getElementById('checkoutDate').value = order.requestedDate;
+    };
+
+    window.cancelOrder = (orderId) => {
+        const order = allOrdersData[orderId];
+        if (!order || order.status !== 'PLACED') return window.showToast("This order can no longer be cancelled.", true);
+        if (!confirm("Cancel this order? This cannot be undone.")) return;
+        update(ref(db, 'orders/' + orderId), { status: 'CANCELLED', cancelledAt: serverTimestamp(), cancelledBy: 'customer' })
+            .then(() => window.showToast("Order Cancelled"))
+            .catch(() => window.showToast("Error cancelling order", true));
+    };
+
+    window.repeatOrder = (orderId) => {
+        const order = allOrdersData[orderId];
+        if (!order) return;
+        localStorage.setItem('oligo_active_producer_id', order.restaurantId);
+        (order.originalItems || order.items).forEach(item => {
+            const ex = basket.find(b => b.id === item.id);
+            if(ex) ex.qty += parseInt(item.qty); else basket.push({...item, price: parseFloat(item.price), qty: parseInt(item.qty)});
+        });
+        saveBasket(); window.openCart(); window.showToast("Items added.");
+    };
+
+    window.logout = () => { signOut(auth).then(() => { window.location.reload(); }).catch((error) => { window.location.reload(); }); };
+    document.getElementById('loginForm').onsubmit = (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value.trim(), document.getElementById('loginPass').value.trim()).catch(err => window.showToast(getFriendlyErrorMessage(err), true)); };
+    document.getElementById('registerForm').onsubmit = (e) => { e.preventDefault(); createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value.trim(), document.getElementById('regPass').value.trim()).then(res => set(ref(db, 'customers/'+res.user.uid), {name: document.getElementById('regName').value.trim(), email: document.getElementById('regEmail').value.trim()})).catch(err => window.showToast(getFriendlyErrorMessage(err), true)); };
+    let searchTimeout; window.addressSearch = (input) => { clearTimeout(searchTimeout); const q = input.value.trim(); if(q.length<3) { document.getElementById('addrSearchList').classList.add('hidden'); return; } searchTimeout = setTimeout(async()=>{ try{ const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5`); const data = await res.json(); const list = document.getElementById('addrSearchList'); list.innerHTML = data.features.map(f => `<div class="search-item" onclick="window.applyAddressResult('${(f.properties.name||f.properties.street||'Location').replace(/'/g,"\\'")}', '${[f.properties.city,f.properties.state].filter(Boolean).join(', ').replace(/'/g,"\\'")}')"><i class="fas fa-map-marker-alt"></i><div><span class="name">${f.properties.name||f.properties.street}</span><span class="addr">${f.properties.city||''}</span></div></div>`).join(''); list.classList.remove('hidden'); }catch(e){} }, 400); };
+    window.applyAddressResult = (n, a) => { document.getElementById('newFullAddr').value = n + ", " + a; document.getElementById('addrSearchList').classList.add('hidden'); };
+    document.addEventListener('click', e => { if(!e.target.closest('.relative')) document.getElementById('addrSearchList').classList.add('hidden'); });
+</script>
+</body>
+</html>
