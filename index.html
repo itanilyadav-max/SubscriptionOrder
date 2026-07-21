@@ -110,9 +110,31 @@
     /* EMPTY STATES */
     .empty-state { text-align: center; padding: 56px 20px; }
     .empty-state .icon-wrap { width: 64px; height: 64px; border-radius: 24px; background: #f0fdf4; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+
+    /* MOBILE VIEWPORT FIX: plain 100vh can be taller than what's actually visible on
+       mobile (browser address bar / WebView chrome eats into it), which silently clips
+       content at the bottom — usually right where the bottom nav sits. --vh is set in
+       JS from the real window.innerHeight as a fallback for WebViews that don't support
+       the modern dvh unit; dvh itself is used directly wherever it's supported. */
+    .app-shell-height { height: 100vh; height: calc(var(--vh, 1vh) * 100); height: 100dvh; }
+    .modal-h-90 { height: 90vh; height: calc(var(--vh, 1vh) * 90); height: 90dvh; }
+    .modal-maxh-90 { max-height: 90vh; max-height: calc(var(--vh, 1vh) * 90); max-height: 90dvh; }
+    .modal-maxh-30 { max-height: 30vh; max-height: calc(var(--vh, 1vh) * 30); max-height: 30dvh; }
 </style>
 </head>
-<body class="text-gray-800 select-none bg-gray-50 h-screen overflow-hidden flex flex-col">
+<body class="text-gray-800 select-none bg-gray-50 app-shell-height overflow-hidden flex flex-col">
+
+<script>
+    // Sets --vh from the real, current viewport height (not the browser's
+    // sometimes-wrong 100vh) — re-run on resize/orientation change/WebView chrome
+    // showing or hiding, so the app shell always matches what's actually visible.
+    function setRealVh() {
+        document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+    }
+    setRealVh();
+    window.addEventListener('resize', setRealVh);
+    window.addEventListener('orientationchange', setRealVh);
+</script>
 
 <!-- APP LOADER -->
 <div id="appLoader">
@@ -178,7 +200,7 @@
 
 <!-- MANAGE SUBSCRIPTION MODAL -->
 <div id="subManageModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex flex-col justify-end sm:justify-center sm:items-center">
-    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl w-full max-w-lg mx-auto h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl w-full max-w-lg mx-auto modal-h-90 overflow-y-auto">
         <div class="flex justify-between items-start mb-6">
             <div>
                 <h2 class="text-2xl font-bold tracking-tight text-gray-800">Plan Overview</h2>
@@ -557,13 +579,13 @@
 
 <!-- CART & SUBSCRIPTION MODAL -->
 <div id="cartModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex flex-col justify-end sm:justify-center sm:items-center">
-    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl max-h-[90vh] overflow-y-auto w-full max-w-xl mx-auto">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl modal-maxh-90 overflow-y-auto w-full max-w-xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold tracking-tight">Your Basket</h2>
             <button onclick="window.closeCart()" class="text-gray-400 w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition"><i class="fas fa-times text-xl"></i></button>
         </div>
         
-        <div id="cartItems" class="space-y-6 mb-8 max-h-[30vh] overflow-y-auto pr-2 custom-scroll"></div>
+        <div id="cartItems" class="space-y-6 mb-8 modal-maxh-30 overflow-y-auto pr-2 custom-scroll"></div>
         
         <div class="border-t border-gray-100 pt-6 space-y-5">
             
