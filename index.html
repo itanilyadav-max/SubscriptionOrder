@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -98,6 +99,10 @@
     /* ITEM CHIPS */
     .item-chip { display: inline-flex; align-items: center; background: #f8fafc; border: 1px solid #eef2f7; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; margin: 2px 4px 2px 0; }
 
+    /* PAYMENT METHOD PILLS */
+    .pm-btn { border: 1px solid #e5e7eb; background: white; color: #6b7280; padding: 12px 10px; border-radius: 14px; font-size: 12px; font-weight: 700; text-align: center; transition: all 0.2s ease; cursor: pointer; }
+    .pm-btn.active { background-color: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 4px 10px rgba(15,23,42,0.25); }
+
     /* TAP-FRIENDLY ACTION BUTTONS */
     .action-btn { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border-radius: 999px; font-size: 12px; font-weight: 700; transition: all 0.15s ease; }
     .action-btn:active { transform: scale(0.95); }
@@ -110,31 +115,9 @@
     /* EMPTY STATES */
     .empty-state { text-align: center; padding: 56px 20px; }
     .empty-state .icon-wrap { width: 64px; height: 64px; border-radius: 24px; background: #f0fdf4; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
-
-    /* MOBILE VIEWPORT FIX: plain 100vh can be taller than what's actually visible on
-       mobile (browser address bar / WebView chrome eats into it), which silently clips
-       content at the bottom — usually right where the bottom nav sits. --vh is set in
-       JS from the real window.innerHeight as a fallback for WebViews that don't support
-       the modern dvh unit; dvh itself is used directly wherever it's supported. */
-    .app-shell-height { height: 100vh; height: calc(var(--vh, 1vh) * 100); height: 100dvh; }
-    .modal-h-90 { height: 90vh; height: calc(var(--vh, 1vh) * 90); height: 90dvh; }
-    .modal-maxh-90 { max-height: 90vh; max-height: calc(var(--vh, 1vh) * 90); max-height: 90dvh; }
-    .modal-maxh-30 { max-height: 30vh; max-height: calc(var(--vh, 1vh) * 30); max-height: 30dvh; }
 </style>
 </head>
-<body class="text-gray-800 select-none bg-gray-50 app-shell-height overflow-hidden flex flex-col">
-
-<script>
-    // Sets --vh from the real, current viewport height (not the browser's
-    // sometimes-wrong 100vh) — re-run on resize/orientation change/WebView chrome
-    // showing or hiding, so the app shell always matches what's actually visible.
-    function setRealVh() {
-        document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
-    }
-    setRealVh();
-    window.addEventListener('resize', setRealVh);
-    window.addEventListener('orientationchange', setRealVh);
-</script>
+<body class="text-gray-800 select-none bg-gray-50 h-screen overflow-hidden flex flex-col">
 
 <!-- APP LOADER -->
 <div id="appLoader">
@@ -200,7 +183,7 @@
 
 <!-- MANAGE SUBSCRIPTION MODAL -->
 <div id="subManageModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex flex-col justify-end sm:justify-center sm:items-center">
-    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl w-full max-w-lg mx-auto modal-h-90 overflow-y-auto">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl w-full max-w-lg mx-auto h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-start mb-6">
             <div>
                 <h2 class="text-2xl font-bold tracking-tight text-gray-800">Plan Overview</h2>
@@ -484,8 +467,14 @@
                         <h3 class="text-4xl font-bold mb-1" id="payTotalOutstanding">₹0</h3>
                         <p class="text-[10px] text-gray-400 mb-4">As per latest ledger update</p>
                         <button id="payNowBtn" onclick="window.payNow()" class="hidden bg-green-500 hover:bg-green-600 text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-md active:scale-95 transition items-center gap-2">
-                            <i class="fas fa-bolt"></i> Pay Now via UPI
+                            <i class="fas fa-bolt"></i> Pay Now (Card/UPI/Wallet)
                         </button>
+                        <div id="payTestModeHint" class="hidden mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-[10px] text-amber-800 leading-relaxed">
+                            <p class="font-bold uppercase tracking-wide mb-1"><i class="fas fa-flask mr-1"></i>Test Mode — no real money moves</p>
+                            <p><span class="font-bold">Card:</span> 4111 1111 1111 1111 &middot; any future expiry &middot; any CVV</p>
+                            <p><span class="font-bold">UPI (success):</span> success@razorpay</p>
+                            <p><span class="font-bold">UPI (fail):</span> failure@razorpay</p>
+                        </div>
                     </div>
                     <div class="modern-card p-8 border border-purple-100 bg-purple-50">
                         <p class="text-xs font-bold text-purple-600 uppercase tracking-widest mb-4">Status</p>
@@ -579,13 +568,13 @@
 
 <!-- CART & SUBSCRIPTION MODAL -->
 <div id="cartModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex flex-col justify-end sm:justify-center sm:items-center">
-    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl modal-maxh-90 overflow-y-auto w-full max-w-xl mx-auto">
+    <div class="bg-white rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl max-h-[90vh] overflow-y-auto w-full max-w-xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold tracking-tight">Your Basket</h2>
             <button onclick="window.closeCart()" class="text-gray-400 w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition"><i class="fas fa-times text-xl"></i></button>
         </div>
         
-        <div id="cartItems" class="space-y-6 mb-8 modal-maxh-30 overflow-y-auto pr-2 custom-scroll"></div>
+        <div id="cartItems" class="space-y-6 mb-8 max-h-[30vh] overflow-y-auto pr-2 custom-scroll"></div>
         
         <div class="border-t border-gray-100 pt-6 space-y-5">
             
@@ -637,11 +626,43 @@
             </div>
 
             <div class="bg-gray-50 p-4 rounded-2xl">
+                <span class="text-[10px] font-bold text-gray-400 uppercase block mb-2">Payment Method</span>
+                <div class="grid grid-cols-2 gap-2" id="paymentMethodSelector">
+                    <button type="button" onclick="window.setPaymentMethod('cod')" id="pm-cod" class="pm-btn active">
+                        <i class="fas fa-hand-holding-usd mr-1.5"></i> Cash on Delivery
+                    </button>
+                    <button type="button" onclick="window.setPaymentMethod('online')" id="pm-online" class="pm-btn">
+                        <i class="fas fa-credit-card mr-1.5"></i> Pay Online
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2">Pay Online covers cards, UPI (GPay/PhonePe/Paytm), netbanking &amp; wallets.</p>
+                <div id="testModeHint" class="hidden mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-[10px] text-amber-800 leading-relaxed">
+                    <p class="font-bold uppercase tracking-wide mb-1"><i class="fas fa-flask mr-1"></i>Test Mode — no real money moves</p>
+                    <p><span class="font-bold">Card:</span> 4111 1111 1111 1111 &middot; any future expiry &middot; any CVV</p>
+                    <p><span class="font-bold">UPI (success):</span> success@razorpay</p>
+                    <p><span class="font-bold">UPI (fail):</span> failure@razorpay</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-2xl">
+                <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Have a Voucher?</span>
+                <div class="flex gap-2">
+                    <input type="text" id="voucherCode" placeholder="Enter code" class="flex-1 bg-white rounded-xl px-3 py-2.5 text-sm font-bold uppercase outline-none ring-1 ring-gray-200 focus:ring-2 focus:ring-green-500">
+                    <button type="button" onclick="window.applyVoucher()" class="bg-gray-900 text-white px-5 rounded-xl text-xs font-bold active:scale-95 transition">Apply</button>
+                </div>
+                <p id="voucherMsg" class="text-[10px] font-bold mt-2 hidden"></p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-2xl">
                 <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Message for Production (Optional)</span>
                 <textarea id="orderNote" placeholder="e.g. Deliver by 10am..." class="w-full bg-transparent border-none text-sm outline-none focus:ring-0 text-gray-800 resize-none" rows="2"></textarea>
             </div>
 
             <div class="space-y-2">
+                <div id="voucherDiscountSection" class="flex justify-between items-center px-2 hidden">
+                    <span class="text-green-600 font-medium text-xs"><i class="fas fa-tag mr-1"></i>Voucher Discount</span>
+                    <span id="voucherDiscountDisplay" class="text-sm font-bold text-green-600">-₹0</span>
+                </div>
                 <div id="deliveryFeeSection" class="flex justify-between items-center px-2 hidden">
                     <span class="text-gray-400 font-medium text-xs">Delivery Fee</span>
                     <span id="deliveryFeeDisplay" class="text-sm font-bold text-gray-800">₹0</span>
@@ -674,10 +695,28 @@
     const db = getDatabase(app);
     const storage = getStorage(app);
 
-    // TODO: replace with your real UPI ID (e.g. "oligofarm@upi" or your bank's VPA).
-    // Used to build the "Pay Now" deep link on the Payments tab.
-    const OLIGO_UPI_ID = "oligo@placeholder";
-    const OLIGO_UPI_PAYEE_NAME = "Oligo Microgreens";
+    // TODO: replace with your real Razorpay Key ID (Dashboard -> Settings -> API Keys).
+    // This is the public "Key ID", not the secret key — it's safe to expose in
+    // client-side code, since it only identifies your account to Razorpay's
+    // checkout widget and can't move money by itself.
+    //
+    // IMPORTANT — read before going live: this integration opens Razorpay
+    // Checkout and trusts the success callback it fires in the browser. That's
+    // fine for getting paid via cards/UPI/netbanking/wallets in a simple app
+    // like this one, but it has no server-side verification step, so a
+    // malicious user could in theory forge a "success" in devtools without
+    // actually paying. For real money at scale you'll want a tiny backend (a
+    // Firebase Cloud Function is enough) that creates the Razorpay order
+    // server-side and verifies the payment signature before marking anything
+    // as paid. Treat this client-only version as good for getting started /
+    // low-risk use, not as a substitute for that step.
+    const RAZORPAY_KEY_ID = "rzp_live_B3ySltBTbQf0B4";
+    const RAZORPAY_BUSINESS_NAME = "Oligo Microgreens";
+    // Drives the "Test Mode" cheat sheet in the checkout UI — it shows only
+    // while a rzp_test_ key is in place, and disappears automatically the
+    // moment you swap in a real rzp_live_ key, so nobody accidentally ships
+    // test-card instructions to real customers.
+    const IS_TEST_MODE = RAZORPAY_KEY_ID.startsWith('rzp_test_');
     
     // --- UTILS ---
     function getFriendlyErrorMessage(error) {
@@ -711,6 +750,9 @@
     let targetInputId = 'vacationDate';
     let allModifications = {};
     let currentAmountDue = 0;
+    let currentPaymentMethod = 'cod'; // 'cod' | 'online'
+    let appliedVoucher = null; // { code, type: 'percent'|'flat', value }
+    let currentDiscount = 0;
 
     // Loader Fallback Timeout
     setTimeout(() => {
@@ -842,26 +884,111 @@
         const isSub = document.getElementById('subToggle').checked;
         const oneTimeConfig = document.getElementById('oneTimeConfig');
         const subConfig = document.getElementById('subConfig');
-        const btn = document.getElementById('orderBtn');
         const subTotalNote = document.getElementById('subTotalNote');
         
         if (isSub) {
             oneTimeConfig.classList.add('hidden');
             subConfig.classList.remove('hidden');
-            btn.innerText = "Start Subscription";
-            btn.className = "w-full bg-blue-600 text-white py-5 rounded-[24px] font-bold shadow-xl shadow-blue-100 transition active:scale-[0.98]";
             subTotalNote.classList.remove('hidden');
             document.getElementById('deliveryFeeSection').classList.add('hidden');
             document.getElementById('deliveryMessage').classList.add('hidden');
         } else {
             oneTimeConfig.classList.remove('hidden');
             subConfig.classList.add('hidden');
-            btn.innerText = "Confirm Order (COD)";
-            btn.className = "w-full bg-green-600 text-white py-5 rounded-[24px] font-bold shadow-xl shadow-green-100 transition active:scale-[0.98]";
             subTotalNote.classList.add('hidden');
             calculateDeliveryLogic(document.getElementById('checkoutDate').value);
         }
+        updateOrderButtonLabel();
     };
+
+    // --- PAYMENT METHOD SELECTION ---
+    window.setPaymentMethod = (method) => {
+        currentPaymentMethod = method;
+        document.getElementById('pm-cod').classList.toggle('active', method === 'cod');
+        document.getElementById('pm-online').classList.toggle('active', method === 'online');
+        document.getElementById('testModeHint').classList.toggle('hidden', !(method === 'online' && IS_TEST_MODE));
+        updateOrderButtonLabel();
+    };
+
+    // Keeps the checkout button's text/color in sync with both the
+    // subscription toggle and the payment method — one place instead of
+    // scattering this logic across two handlers.
+    function updateOrderButtonLabel() {
+        const btn = document.getElementById('orderBtn');
+        if (!btn) return;
+        const isSub = document.getElementById('subToggle').checked;
+        const isOnline = currentPaymentMethod === 'online';
+        if (isSub) {
+            btn.innerText = isOnline ? "Pay & Start Subscription" : "Start Subscription (COD)";
+            btn.className = `w-full ${isOnline ? 'bg-purple-600 shadow-purple-100' : 'bg-blue-600 shadow-blue-100'} text-white py-5 rounded-[24px] font-bold shadow-xl transition active:scale-[0.98]`;
+        } else {
+            btn.innerText = isOnline ? "Pay & Confirm Order" : "Confirm Order (COD)";
+            btn.className = `w-full ${isOnline ? 'bg-purple-600 shadow-purple-100' : 'bg-green-600 shadow-green-100'} text-white py-5 rounded-[24px] font-bold shadow-xl transition active:scale-[0.98]`;
+        }
+    }
+
+    // --- VOUCHER LOGIC ---
+    // Vouchers live under `vouchers/{CODE}` in Firebase, e.g.
+    // vouchers/WELCOME10 = { active: true, type: "percent", value: 10 }
+    // vouchers/FLAT50   = { active: true, type: "flat", value: 50 }
+    window.applyVoucher = () => {
+        const codeInput = document.getElementById('voucherCode');
+        const code = codeInput.value.trim().toUpperCase();
+        const msgEl = document.getElementById('voucherMsg');
+        if (!code) return;
+
+        onValue(ref(db, 'vouchers/' + code), (snap) => {
+            const v = snap.val();
+            msgEl.classList.remove('hidden');
+            if (!v || v.active === false) {
+                appliedVoucher = null;
+                msgEl.className = "text-[10px] font-bold mt-2 text-red-500";
+                msgEl.innerText = "Invalid or expired voucher.";
+            } else {
+                appliedVoucher = { code, type: v.type, value: parseFloat(v.value) || 0 };
+                msgEl.className = "text-[10px] font-bold mt-2 text-green-600";
+                msgEl.innerText = v.type === 'percent' ? `${appliedVoucher.value}% off applied!` : `₹${appliedVoucher.value} off applied!`;
+            }
+            calculateDeliveryLogic(document.getElementById('checkoutDate').value);
+        }, { onlyOnce: true });
+    };
+
+    // --- RAZORPAY CHECKOUT (shared by order payment + "Pay Now" ledger payment) ---
+    // Opens Razorpay's hosted widget, which itself offers cards, UPI (GPay/
+    // PhonePe/Paytm/etc via UPI intent), netbanking, and wallets — so this one
+    // integration covers all of those payment methods without separate code
+    // for each. See the RAZORPAY_KEY_ID comment near the top of this script
+    // for the production caveat about server-side verification.
+    function openRazorpayCheckout({ amount, description, onSuccess, onDismiss }) {
+        if (typeof Razorpay === 'undefined') {
+            window.showToast("Payment gateway failed to load. Check your connection.", true);
+            return;
+        }
+        if (!amount || amount <= 0) {
+            window.showToast("Nothing to pay.", true);
+            return;
+        }
+        const options = {
+            key: RAZORPAY_KEY_ID,
+            amount: Math.round(amount * 100), // Razorpay expects paise
+            currency: "INR",
+            name: RAZORPAY_BUSINESS_NAME,
+            description: description,
+            prefill: {
+                name: userLocalData?.name || "",
+                contact: userLocalData?.phone || "",
+                email: auth.currentUser?.email || ""
+            },
+            theme: { color: "#10b981" },
+            handler: function (response) { onSuccess(response); },
+            modal: { ondismiss: function () { if (onDismiss) onDismiss(); } }
+        };
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (resp) {
+            window.showToast("Payment failed: " + (resp.error?.description || "Please try again."), true);
+        });
+        rzp.open();
+    }
 
     window.toggleDay = (btn, day) => {
         btn.classList.toggle('selected');
@@ -883,6 +1010,18 @@
         document.getElementById('subToggle').checked = false;
         selectedSubscriptionDays = [];
         document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+
+        // Reset payment method + voucher each time the cart opens
+        currentPaymentMethod = 'cod';
+        document.getElementById('pm-cod').classList.add('active');
+        document.getElementById('pm-online').classList.remove('active');
+        document.getElementById('testModeHint').classList.add('hidden');
+        appliedVoucher = null;
+        currentDiscount = 0;
+        document.getElementById('voucherCode').value = '';
+        document.getElementById('voucherMsg').classList.add('hidden');
+        document.getElementById('voucherDiscountSection').classList.add('hidden');
+
         window.toggleSubscriptionMode();
 
         const newDateInput = dateInput.cloneNode(true);
@@ -910,6 +1049,22 @@
         const totalEl = document.getElementById('cartTotal');
         
         let basketTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+
+        // Voucher discount (capped so total never goes below the delivery fee)
+        currentDiscount = 0;
+        if (appliedVoucher) {
+            currentDiscount = appliedVoucher.type === 'percent'
+                ? (basketTotal * appliedVoucher.value / 100)
+                : appliedVoucher.value;
+            currentDiscount = Math.min(currentDiscount, basketTotal);
+        }
+        const discSection = document.getElementById('voucherDiscountSection');
+        if (currentDiscount > 0) {
+            discSection.classList.remove('hidden');
+            document.getElementById('voucherDiscountDisplay').innerText = "-₹" + Math.round(currentDiscount);
+        } else {
+            discSection.classList.add('hidden');
+        }
         
         currentDeliveryFee = 0;
         currentDeliveryMethod = "Standard";
@@ -936,7 +1091,7 @@
                 msgEl.className = "px-2 text-[10px] font-bold italic text-red-600 block";
             }
         }
-        totalEl.innerText = "Box " + (basketTotal + currentDeliveryFee);
+        totalEl.innerText = "Box " + Math.round(basketTotal - currentDiscount + currentDeliveryFee);
     }
 
     window.closeCart = () => {
@@ -1044,6 +1199,7 @@
                 const payBtn = document.getElementById('payNowBtn');
                 if (payBtn) payBtn.classList.toggle('hidden', due <= 0);
                 if (payBtn) payBtn.classList.toggle('flex', due > 0);
+                document.getElementById('payTestModeHint').classList.toggle('hidden', !(due > 0 && IS_TEST_MODE));
                 
                 const statusDetails = `
                     <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
@@ -1110,19 +1266,58 @@
         currentAmountDue = 0;
         const payBtn = document.getElementById('payNowBtn');
         if (payBtn) { payBtn.classList.add('hidden'); payBtn.classList.remove('flex'); }
+        document.getElementById('payTestModeHint').classList.add('hidden');
     }
 
-    // --- PAY NOW (UPI DEEP LINK) ---
-    // Builds a standard upi://pay link (works with GPay, PhonePe, Paytm, etc. on
-    // mobile). OLIGO_UPI_ID is a placeholder near the top of this script —
-    // replace it with the real VPA before going live.
+    // --- PAY NOW (outstanding ledger balance) ---
     window.payNow = () => {
         if (!currentAmountDue || currentAmountDue <= 0) return window.showToast("No outstanding amount to pay.", true);
-        const note = encodeURIComponent("Oligo payment - " + (userLocalData?.name || "Customer"));
-        const payeeName = encodeURIComponent(OLIGO_UPI_PAYEE_NAME);
-        const upiUrl = `upi://pay?pa=${OLIGO_UPI_ID}&pn=${payeeName}&am=${currentAmountDue}&cu=INR&tn=${note}`;
-        window.location.href = upiUrl;
+        const amountToPay = currentAmountDue;
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) payBtn.disabled = true;
+        openRazorpayCheckout({
+            amount: amountToPay,
+            description: "Outstanding balance",
+            onSuccess: (response) => {
+                recordLedgerPayment(amountToPay, response.razorpay_payment_id);
+                if (payBtn) payBtn.disabled = false;
+            },
+            onDismiss: () => { if (payBtn) payBtn.disabled = false; }
+        });
     };
+
+    // Finds this customer's receivables entry (matched by phone, same as
+    // fetchPayments above) and logs the payment + reduces the amount due.
+    function recordLedgerPayment(amount, razorpayPaymentId) {
+        if (!userLocalData || !userLocalData.phone) return;
+        onValue(ref(db, 'receivables'), (snap) => {
+            const data = snap.val();
+            const entry = data ? Object.entries(data).find(([_, c]) => c.phone === userLocalData.phone) : null;
+            if (!entry) {
+                window.showToast("Payment captured, but no ledger record was found to update. Contact support.", true);
+                return;
+            }
+            const [clientKey, clientEntry] = entry;
+            const newDue = Math.max(0, (parseFloat(clientEntry.amountDue) || 0) - amount);
+            push(ref(db, `receivables/${clientKey}/logs`), {
+                received: amount,
+                note: "Online payment (Razorpay)",
+                status: "Paid",
+                method: "online",
+                razorpayPaymentId: razorpayPaymentId,
+                timestamp: serverTimestamp()
+            }).then(() => {
+                update(ref(db, `receivables/${clientKey}`), {
+                    amountDue: newDue,
+                    lastUpdated: serverTimestamp(),
+                    status: newDue <= 0 ? 'Cleared' : 'Partial'
+                });
+                window.showToast("Payment successful — ledger updated!");
+            }).catch(() => {
+                window.showToast("Payment succeeded, but updating the ledger failed. Contact support.", true);
+            });
+        }, { onlyOnce: true });
+    }
 
     // --- COMPLAINTS LOGIC ---
     window.submitComplaint = async () => {
@@ -1339,7 +1534,7 @@
         }).join('');
         const dateIn = document.getElementById('checkoutDate').value;
         if(dateIn) calculateDeliveryLogic(dateIn);
-        if(document.getElementById('subToggle').checked) totalEl.innerText = "Box " + total;
+        if(document.getElementById('subToggle').checked) totalEl.innerText = "Box " + Math.round(total - currentDiscount);
     }
 
     window.changeQty = (idx, d) => { basket[idx].qty += d; if(basket[idx].qty <= 0) basket.splice(idx, 1); saveBasket(); renderBasket(); };
@@ -1352,13 +1547,28 @@
             const addr = document.getElementById('checkoutAddrSelect').value;
             if(!addr) return window.showToast("Select address.", true);
             const note = document.getElementById('orderNote').value.trim();
-            const itemsTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+            const rawItemsTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+            const discount = Math.min(currentDiscount || 0, rawItemsTotal);
+            const itemsTotal = rawItemsTotal - discount; // discounted item total, used for what production/ledger actually charges
+            const voucherCode = appliedVoucher ? appliedVoucher.code : null;
             const isSubscription = document.getElementById('subToggle').checked;
+            const isOnlinePayment = currentPaymentMethod === 'online';
 
-            if (isSubscription) {
-                if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
-                const duration = document.getElementById('subDuration').value;
-                
+            // Shared payment fields stamped onto whatever gets saved below.
+            // For COD this is "pending" until cash changes hands at the door;
+            // for online payment this only gets called once Razorpay confirms
+            // success (see the branching at the bottom of this function).
+            function paymentFields(razorpayResponse) {
+                return {
+                    paymentMethod: isOnlinePayment ? "ONLINE" : "COD",
+                    paymentStatus: isOnlinePayment ? "PAID" : "PENDING",
+                    voucherCode: voucherCode,
+                    discountAmount: discount,
+                    ...(razorpayResponse ? { razorpayPaymentId: razorpayResponse.razorpay_payment_id } : {})
+                };
+            }
+
+            function saveSubscription(razorpayResponse) {
                 // 1. Create Subscription Record
                 const subData = { 
                     customerUid: auth.currentUser.uid, 
@@ -1369,10 +1579,11 @@
                     totalPerDelivery: itemsTotal,
                     address: addr,
                     frequency: selectedSubscriptionDays,
-                    duration: duration,
+                    duration: document.getElementById('subDuration').value,
                     customerNote: note,
                     status: "ACTIVE", 
                     sourceApp: "customer-sub-final",
+                    ...paymentFields(razorpayResponse),
                     createdAt: serverTimestamp() 
                 };
                 
@@ -1403,6 +1614,7 @@
                     isSubscriptionOrder: true, // Tag it — kept consistent with production app's daily-accept flow
                     subscriptionId: subKey, // Links this order back to its parent subscription
                     sourceApp: "customer-sub-final",
+                    ...paymentFields(razorpayResponse),
                     createdAt: serverTimestamp()
                 };
 
@@ -1418,14 +1630,42 @@
                     window.switchOrderView('subs'); 
                     window.showToast("Subscription & First Order Placed!"); 
                 });
+            }
+
+            function saveOneTimeOrder(reqDate, razorpayResponse) {
+                const grandTotal = itemsTotal + currentDeliveryFee;
+                const orderData = { customerUid: auth.currentUser.uid, customerName: userLocalData.name || "Guest", customerPhone: userLocalData.phone, restaurantId: activeProducerId, items: basket, totalAmount: grandTotal, deliveryFee: currentDeliveryFee, deliveryMethod: currentDeliveryMethod, address: addr, requestedDate: reqDate, customerNote: note, status: "PLACED", sourceApp: "customer-sub-final", ...paymentFields(razorpayResponse), createdAt: serverTimestamp() };
+                if(editingOrderId) { delete orderData.createdAt; orderData.updatedAt = serverTimestamp(); set(ref(db, 'orders/' + editingOrderId), orderData).then(successHandler); } else { push(ref(db, 'orders'), orderData).then(successHandler); }
+            }
+
+            function successHandler() { basket = []; saveBasket(); window.closeCart(); window.navTo('viewOrders'); window.switchOrderView('history'); window.showToast(editingOrderId ? "Order Updated" : "Order Placed"); editingOrderId = null; }
+
+            if (isSubscription) {
+                if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
+                const amountToCharge = itemsTotal + currentDeliveryFee;
+                if (isOnlinePayment) {
+                    openRazorpayCheckout({
+                        amount: amountToCharge,
+                        description: "Oligo subscription — first delivery",
+                        onSuccess: (response) => saveSubscription(response)
+                    });
+                } else {
+                    saveSubscription(null);
+                }
             } else {
                 const reqDate = document.getElementById('checkoutDate').value;
                 if(!reqDate) return window.showToast("Select date.", true);
-                const grandTotal = itemsTotal + currentDeliveryFee;
-                const orderData = { customerUid: auth.currentUser.uid, customerName: userLocalData.name || "Guest", customerPhone: userLocalData.phone, restaurantId: activeProducerId, items: basket, totalAmount: grandTotal, deliveryFee: currentDeliveryFee, deliveryMethod: currentDeliveryMethod, address: addr, requestedDate: reqDate, customerNote: note, status: "PLACED", sourceApp: "customer-sub-final", createdAt: serverTimestamp() };
-                if(editingOrderId) { delete orderData.createdAt; orderData.updatedAt = serverTimestamp(); set(ref(db, 'orders/' + editingOrderId), orderData).then(successHandler); } else { push(ref(db, 'orders'), orderData).then(successHandler); }
+                const amountToCharge = itemsTotal + currentDeliveryFee;
+                if (isOnlinePayment) {
+                    openRazorpayCheckout({
+                        amount: amountToCharge,
+                        description: "Oligo order",
+                        onSuccess: (response) => saveOneTimeOrder(reqDate, response)
+                    });
+                } else {
+                    saveOneTimeOrder(reqDate, null);
+                }
             }
-            function successHandler() { basket = []; saveBasket(); window.closeCart(); window.navTo('viewOrders'); window.switchOrderView('history'); window.showToast(editingOrderId ? "Order Updated" : "Order Placed"); editingOrderId = null; }
         } catch(e) { window.showToast("Error", true); }
     };
 
