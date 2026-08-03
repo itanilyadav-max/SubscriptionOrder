@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -11,6 +14,13 @@
 
 <style>
     body { font-family: 'Poppins', sans-serif; padding-bottom: 90px; background-color: #f9fafb; -webkit-tap-highlight-color: transparent; }
+
+    /* SAFE-AREA (notch / Dynamic Island / home-indicator) PADDING
+       These only do anything once viewport-fit=cover is set on the meta tag
+       above — without it, env(safe-area-inset-*) always resolves to 0.
+       The 12px/8px fallbacks keep sensible spacing on phones with no notch. */
+    .pt-safe { padding-top: max(env(safe-area-inset-top), 12px); }
+    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 8px); }
     
     /* SCROLLBAR HIDING */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -308,7 +318,7 @@
     <div class="flex-1 flex flex-col h-full w-full relative overflow-hidden">
         
         <!-- MOBILE HEADER -->
-        <header class="lg:hidden bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+        <header class="lg:hidden bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6 pb-4 pt-safe flex justify-between items-center border-b border-gray-100 shrink-0">
             <div class="flex items-center gap-2">
                 <i class="fas fa-seedling text-green-600 text-2xl"></i>
                 <h1 class="font-bold text-2xl text-green-700 tracking-tight">Oligo</h1>
