@@ -681,6 +681,33 @@
     </div>
 </div>
 
+<!-- Shown the instant Razorpay confirms payment, while we finish saving the order.
+     This closes the gap where a customer has already paid but sees nothing change
+     on screen for a second or two — without this they can't tell if it worked. -->
+<div id="paymentProcessingOverlay" class="fixed inset-0 bg-black/60 z-[60] hidden flex flex-col items-center justify-center text-white text-center px-6">
+    <div class="w-14 h-14 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+    <p class="font-bold text-lg">Payment received — confirming your order...</p>
+    <p class="text-sm text-white/70 mt-1">Please don't close this window.</p>
+</div>
+
+<!-- Single modal reused for both a successful order and the rare case where payment
+     succeeded but saving the order failed — so the customer is never left staring
+     at a stale basket wondering what happened either way. -->
+<div id="orderResultModal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center px-6">
+    <div class="bg-white rounded-[28px] max-w-sm w-full p-6 text-center shadow-2xl">
+        <div id="orderResultIconWrap" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+            <i id="orderResultIcon" class="fas text-3xl"></i>
+        </div>
+        <h2 id="orderResultTitle" class="text-xl font-bold text-gray-900 mb-2"></h2>
+        <p id="orderResultBody" class="text-sm text-gray-500 leading-relaxed mb-4"></p>
+        <div id="orderResultSummary" class="bg-gray-50 rounded-2xl p-4 text-left text-sm space-y-1.5 mb-5 hidden"></div>
+        <div class="space-y-2">
+            <button id="orderResultPrimaryBtn" class="w-full bg-green-600 text-white py-3.5 rounded-2xl font-bold active:scale-[0.98] transition">View My Orders</button>
+            <button onclick="window.closeOrderResultModal()" class="w-full text-gray-400 py-2 text-sm font-bold">Continue Shopping</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -845,6 +872,46 @@
         t.innerText = m;
         t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-xs font-bold shadow-xl text-center transition-all duration-300 show ${isError ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`;
         toastTimeout = setTimeout(() => { t.classList.remove('show'); }, 3000);
+    };
+
+    // --- PAYMENT PROCESSING OVERLAY ---
+    // Bridges the gap between "Razorpay says payment succeeded" and "we've
+    // actually finished saving the order" — without this, the customer sees
+    // the Razorpay widget vanish and nothing else happen for a second or two,
+    // which reads as broken even when it isn't.
+    function showPaymentProcessing() { document.getElementById('paymentProcessingOverlay').classList.remove('hidden'); document.getElementById('paymentProcessingOverlay').classList.add('flex'); }
+    function hidePaymentProcessing() { document.getElementById('paymentProcessingOverlay').classList.add('hidden'); document.getElementById('paymentProcessingOverlay').classList.remove('flex'); }
+
+    // --- ORDER RESULT MODAL (success or error) ---
+    // opts: { type: 'success'|'error', title, body, summaryLines: [ {label, value} ], primaryLabel, onPrimary }
+    function showOrderResult(opts) {
+        const iconWrap = document.getElementById('orderResultIconWrap');
+        const icon = document.getElementById('orderResultIcon');
+        const isSuccess = opts.type === 'success';
+        iconWrap.className = `w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 ${isSuccess ? 'bg-green-100' : 'bg-red-100'}`;
+        icon.className = `fas text-3xl ${isSuccess ? 'fa-check text-green-600' : 'fa-triangle-exclamation text-red-500'}`;
+        document.getElementById('orderResultTitle').innerText = opts.title;
+        document.getElementById('orderResultBody').innerText = opts.body;
+
+        const summaryEl = document.getElementById('orderResultSummary');
+        if (opts.summaryLines && opts.summaryLines.length) {
+            summaryEl.classList.remove('hidden');
+            summaryEl.innerHTML = opts.summaryLines.map(l => `<div class="flex justify-between"><span class="text-gray-400">${l.label}</span><span class="font-bold text-gray-800">${l.value}</span></div>`).join('');
+        } else {
+            summaryEl.classList.add('hidden');
+        }
+
+        const primaryBtn = document.getElementById('orderResultPrimaryBtn');
+        primaryBtn.innerText = opts.primaryLabel || "View My Orders";
+        primaryBtn.className = `w-full ${isSuccess ? 'bg-green-600' : 'bg-gray-900'} text-white py-3.5 rounded-2xl font-bold active:scale-[0.98] transition`;
+        primaryBtn.onclick = () => { window.closeOrderResultModal(); if (opts.onPrimary) opts.onPrimary(); };
+
+        document.getElementById('orderResultModal').classList.remove('hidden');
+        document.getElementById('orderResultModal').classList.add('flex');
+    }
+    window.closeOrderResultModal = () => {
+        document.getElementById('orderResultModal').classList.add('hidden');
+        document.getElementById('orderResultModal').classList.remove('flex');
     };
 
     window.toggleRecovery = (show) => document.getElementById('recoveryModal').classList.toggle('hidden', !show);
@@ -1569,6 +1636,7 @@
             }
 
             function saveSubscription(razorpayResponse) {
+                if (isOnlinePayment) showPaymentProcessing();
                 // 1. Create Subscription Record
                 const subData = { 
                     customerUid: auth.currentUser.uid, 
@@ -1622,23 +1690,89 @@
                 Promise.all([
                     subRef,
                     push(ref(db, 'orders'), firstOrderData)
-                ]).then(() => { 
-                    basket = []; 
-                    saveBasket(); 
-                    window.closeCart(); 
-                    window.navTo('viewOrders'); 
-                    window.switchOrderView('subs'); 
-                    window.showToast("Subscription & First Order Placed!"); 
+                ]).then(() => {
+                    hidePaymentProcessing();
+                    basket = [];
+                    saveBasket();
+                    window.closeCart();
+                    renderBasket();
+                    showOrderResult({
+                        type: 'success',
+                        title: 'Subscription Started!',
+                        body: 'Your first delivery is on its way, and future deliveries will follow your chosen schedule.',
+                        summaryLines: [
+                            { label: 'Delivery days', value: selectedSubscriptionDays.join(', ') },
+                            { label: 'Per delivery', value: '₹' + Math.round(itemsTotal + currentDeliveryFee) },
+                            { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
+                        ],
+                        onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('subs'); }
+                    });
+                }).catch((err) => {
+                    hidePaymentProcessing();
+                    handleSaveFailure(razorpayResponse, err);
                 });
             }
 
             function saveOneTimeOrder(reqDate, razorpayResponse) {
+                if (isOnlinePayment) showPaymentProcessing();
                 const grandTotal = itemsTotal + currentDeliveryFee;
                 const orderData = { customerUid: auth.currentUser.uid, customerName: userLocalData.name || "Guest", customerPhone: userLocalData.phone, restaurantId: activeProducerId, items: basket, totalAmount: grandTotal, deliveryFee: currentDeliveryFee, deliveryMethod: currentDeliveryMethod, address: addr, requestedDate: reqDate, customerNote: note, status: "PLACED", sourceApp: "customer-sub-final", ...paymentFields(razorpayResponse), createdAt: serverTimestamp() };
-                if(editingOrderId) { delete orderData.createdAt; orderData.updatedAt = serverTimestamp(); set(ref(db, 'orders/' + editingOrderId), orderData).then(successHandler); } else { push(ref(db, 'orders'), orderData).then(successHandler); }
+                const savePromise = editingOrderId
+                    ? (() => { const d = { ...orderData }; delete d.createdAt; d.updatedAt = serverTimestamp(); return set(ref(db, 'orders/' + editingOrderId), d); })()
+                    : push(ref(db, 'orders'), orderData);
+                savePromise.then(() => successHandler(grandTotal, reqDate)).catch((err) => {
+                    hidePaymentProcessing();
+                    handleSaveFailure(razorpayResponse, err);
+                });
             }
 
-            function successHandler() { basket = []; saveBasket(); window.closeCart(); window.navTo('viewOrders'); window.switchOrderView('history'); window.showToast(editingOrderId ? "Order Updated" : "Order Placed"); editingOrderId = null; }
+            // Only reachable if payment was 'online' and Razorpay already confirmed
+            // success, but writing the order to Firebase then failed (bad network,
+            // rules issue, etc). The payment is real and already taken — so the
+            // worst thing we could do here is say nothing. Surface the Razorpay
+            // Payment ID directly so the customer has a record of it even though
+            // it never made it into our own database.
+            function handleSaveFailure(razorpayResponse, err) {
+                console.error("Order save failed:", err);
+                if (razorpayResponse) {
+                    showOrderResult({
+                        type: 'error',
+                        title: 'Payment received, order not confirmed',
+                        body: "Your payment succeeded, but we hit a problem saving your order. Please contact support with the Payment ID below — don't pay again.",
+                        summaryLines: [ { label: 'Payment ID', value: razorpayResponse.razorpay_payment_id } ],
+                        primaryLabel: 'Get Support',
+                        onPrimary: () => { window.navTo('viewComplaints'); }
+                    });
+                } else {
+                    showOrderResult({
+                        type: 'error',
+                        title: 'Order not placed',
+                        body: 'Something went wrong saving your order. Please check your connection and try again.',
+                        primaryLabel: 'OK'
+                    });
+                }
+            }
+
+            function successHandler(grandTotal, reqDate) {
+                hidePaymentProcessing();
+                basket = [];
+                saveBasket();
+                window.closeCart();
+                renderBasket();
+                const wasEditing = !!editingOrderId;
+                editingOrderId = null;
+                showOrderResult({
+                    type: 'success',
+                    title: wasEditing ? 'Order Updated!' : 'Order Placed!',
+                    body: wasEditing ? "We've updated your order." : "We've got your order and it'll be prepared for delivery.",
+                    summaryLines: [
+                        { label: 'Delivery date', value: reqDate || '—' },
+                        { label: 'Total', value: '₹' + Math.round(grandTotal) },
+                        { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
+                    ],
+                    onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('history'); }
+                });
+            }
 
             if (isSubscription) {
                 if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
