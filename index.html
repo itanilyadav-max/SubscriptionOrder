@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Razorpay SDK - load with fallback -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -435,7 +434,6 @@
 
     .modal-backdrop.flex { display: flex; }
 
-    /* Payment redirect notice */
     .payment-redirect-notice {
         background: #fef3c7;
         border: 1px solid #f59e0b;
@@ -460,7 +458,7 @@
         color: #78350f;
     }
 
-    /* Payment overlay - full screen for APK with Razorpay modal support */
+    /* Payment Modal */
     #paymentModalOverlay {
         position: fixed;
         inset: 0;
@@ -489,6 +487,12 @@
         padding: 32px 24px;
         text-align: center;
         position: relative;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
 
     #paymentModalOverlay .modal-box .close-btn {
@@ -500,6 +504,13 @@
         font-size: 20px;
         color: #94a3b8;
         cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    #paymentModalOverlay .modal-box .close-btn:hover {
+        background: #f1f5f9;
     }
 
     #paymentModalOverlay .modal-box .icon-wrap {
@@ -528,6 +539,16 @@
         color: #dc2626;
     }
 
+    #paymentModalOverlay .modal-box .spinner-border {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+
     #paymentModalOverlay .modal-box h3 {
         font-size: 18px;
         font-weight: 700;
@@ -540,16 +561,6 @@
         color: #64748b;
         margin-bottom: 20px;
         line-height: 1.5;
-    }
-
-    #paymentModalOverlay .modal-box .spinner-border {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #e2e8f0;
-        border-top-color: #10b981;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 16px;
     }
 
     #paymentModalOverlay .modal-box .btn-group {
@@ -622,6 +633,7 @@
         border-radius: 24px;
         padding: 32px 24px;
         text-align: center;
+        animation: slideUp 0.3s ease-out;
     }
 
     .cod-confirm-modal .card .icon {
@@ -678,8 +690,12 @@
         background: #cbd5e1;
     }
 
-    /* Ensure Razorpay modal appears on top */
+    /* Override Razorpay modal z-index */
     .razorpay-checkout {
+        z-index: 999999 !important;
+    }
+
+    .razorpay-container {
         z-index: 999999 !important;
     }
 </style>
@@ -761,10 +777,10 @@
     </div>
 </div>
 
-<!-- PAYMENT MODAL OVERLAY - Shows payment status -->
+<!-- PAYMENT MODAL OVERLAY -->
 <div id="paymentModalOverlay">
     <div class="modal-box">
-        <button class="close-btn" onclick="window.closePaymentModal()"><i class="fas fa-times"></i></button>
+        <button class="close-btn" onclick="window.closePaymentModal(false)"><i class="fas fa-times"></i></button>
         
         <div id="paymentModalLoading">
             <div class="spinner-border"></div>
@@ -1177,7 +1193,6 @@
                     <p><span class="font-bold">UPI (fail):</span> failure@razorpay</p>
                 </div>
 
-                <!-- Payment redirect notice -->
                 <div class="payment-redirect-notice" id="paymentRedirectNotice">
                     <p><i class="fas fa-info-circle mr-1"></i> You'll be redirected to a secure payment page. <span class="highlight">Don't close the browser</span> — you'll be brought back automatically after payment.</p>
                 </div>
@@ -1361,8 +1376,6 @@
     let currentDiscount = 0;
     let isPaymentInProgress = false;
     let pendingOrderData = null;
-    let isCODConfirm = false;
-    let paymentModalCallback = null;
 
     // Helper functions
     function getFriendlyErrorMessage(error) {
@@ -1523,11 +1536,64 @@
     };
 
     // ================================================================
-    // PAYMENT FUNCTIONS - Using Razorpay SDK properly
+    // PAYMENT FUNCTIONS - Fixed handler
     // ================================================================
 
+    // Show/hide payment modal
+    function showPaymentModal(state, message) {
+        const overlay = document.getElementById('paymentModalOverlay');
+        const loading = document.getElementById('paymentModalLoading');
+        const success = document.getElementById('paymentModalSuccess');
+        const error = document.getElementById('paymentModalError');
+        const errorMsg = document.getElementById('paymentModalErrorMsg');
+
+        loading.style.display = 'none';
+        success.style.display = 'none';
+        error.style.display = 'none';
+
+        overlay.classList.add('show');
+
+        if (state === 'loading') {
+            loading.style.display = 'block';
+        } else if (state === 'success') {
+            success.style.display = 'block';
+        } else if (state === 'error') {
+            errorMsg.innerText = message || 'There was an issue processing your payment. Please try again.';
+            error.style.display = 'block';
+        }
+    }
+
+    window.closePaymentModal = (success = false) => {
+        const overlay = document.getElementById('paymentModalOverlay');
+        overlay.classList.remove('show');
+        if (success && pendingOrderData && pendingOrderData.onSuccess) {
+            // The success handler is already called from Razorpay's handler
+            // Just cleanup
+        }
+        pendingOrderData = null;
+        isPaymentInProgress = false;
+    };
+
+    window.retryPaymentModal = () => {
+        document.getElementById('paymentModalError').style.display = 'none';
+        document.getElementById('paymentModalLoading').style.display = 'block';
+        
+        if (pendingOrderData) {
+            const { amount, description, onSuccess, onDismiss } = pendingOrderData;
+            // Reset and try again
+            isPaymentInProgress = false;
+            openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
+        }
+    };
+
+    // Main Razorpay checkout function
     function openRazorpayCheckout({ amount, description, onSuccess, onDismiss }) {
-        if (isPaymentInProgress) return;
+        // Prevent multiple payments
+        if (isPaymentInProgress) {
+            window.showToast("Payment already in progress...", true);
+            return;
+        }
+
         if (!amount || amount <= 0) {
             window.showToast("Nothing to pay.", true);
             if (onDismiss) onDismiss();
@@ -1552,8 +1618,9 @@
         }
 
         isPaymentInProgress = true;
+        pendingOrderData = { amount, description, onSuccess, onDismiss };
 
-        // Show payment modal with loading state
+        // Show loading modal
         showPaymentModal('loading');
 
         try {
@@ -1568,33 +1635,50 @@
                     contact: userLocalData?.phone || "",
                     email: auth.currentUser?.email || ""
                 },
-                theme: { color: "#10b981" },
+                theme: { 
+                    color: "#10b981",
+                    hide_topbar: false
+                },
+                // This is the critical handler - it's called when payment is successful
                 handler: function (response) {
+                    console.log("Payment success response:", response);
                     isPaymentInProgress = false;
-                    // Show success
+                    
+                    // Show success modal
                     showPaymentModal('success');
-                    if (onSuccess) onSuccess(response);
+                    
+                    // Call the success callback with the response
+                    if (onSuccess) {
+                        onSuccess(response);
+                    }
+                    
                     // Auto-close after 3 seconds
                     setTimeout(() => {
-                        closePaymentModal(true);
+                        window.closePaymentModal(true);
                     }, 3000);
                 },
                 modal: { 
                     ondismiss: function () {
+                        console.log("Payment modal dismissed");
                         isPaymentInProgress = false;
-                        closePaymentModal(false);
+                        window.closePaymentModal(false);
                         if (onDismiss) onDismiss();
                     }
                 }
             };
 
+            console.log("Opening Razorpay checkout with options:", options);
             const rzp = new Razorpay(options);
             
+            // Handle payment failure event
             rzp.on('payment.failed', function (resp) {
+                console.error("Payment failed:", resp);
                 isPaymentInProgress = false;
-                showPaymentModal('error', resp.error?.description || "Payment failed. Please try again.");
+                const errorMsg = resp.error?.description || "Payment failed. Please try again.";
+                showPaymentModal('error', errorMsg);
             });
 
+            // Open the checkout
             rzp.open();
 
         } catch (e) {
@@ -1604,73 +1688,23 @@
         }
     }
 
-    // Payment Modal functions
-    function showPaymentModal(state, message) {
-        const overlay = document.getElementById('paymentModalOverlay');
-        const loading = document.getElementById('paymentModalLoading');
-        const success = document.getElementById('paymentModalSuccess');
-        const error = document.getElementById('paymentModalError');
-        const errorMsg = document.getElementById('paymentModalErrorMsg');
-
-        // Reset all
-        loading.style.display = 'none';
-        success.style.display = 'none';
-        error.style.display = 'none';
-
-        overlay.classList.add('show');
-
-        if (state === 'loading') {
-            loading.style.display = 'block';
-        } else if (state === 'success') {
-            success.style.display = 'block';
-        } else if (state === 'error') {
-            errorMsg.innerText = message || 'There was an issue processing your payment. Please try again.';
-            error.style.display = 'block';
-        }
-    }
-
-    window.closePaymentModal = (success = false) => {
-        const overlay = document.getElementById('paymentModalOverlay');
-        overlay.classList.remove('show');
-        
-        if (success && paymentModalCallback) {
-            paymentModalCallback(true);
-            paymentModalCallback = null;
-        }
-    };
-
-    window.retryPaymentModal = () => {
-        // Hide error, show loading
-        document.getElementById('paymentModalError').style.display = 'none';
-        document.getElementById('paymentModalLoading').style.display = 'block';
-        
-        if (pendingOrderData) {
-            const { amount, description, onSuccess, onDismiss } = pendingOrderData;
-            openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
-        }
-    };
-
     function processPayment({ amount, description, onSuccess, onDismiss }) {
-        pendingOrderData = { amount, description, onSuccess, onDismiss };
         openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
     }
 
     // COD confirmation
     window.openCODConfirm = (callback) => {
-        isCODConfirm = true;
         document.getElementById('codConfirmModal').classList.add('flex');
         window._codCallback = callback;
     };
 
     window.closeCODConfirm = () => {
         document.getElementById('codConfirmModal').classList.remove('flex');
-        isCODConfirm = false;
         window._codCallback = null;
     };
 
     window.confirmCODOrder = () => {
         document.getElementById('codConfirmModal').classList.remove('flex');
-        isCODConfirm = false;
         if (window._codCallback) {
             window._codCallback();
             window._codCallback = null;
@@ -1917,7 +1951,7 @@
     }
 
     // ================================================================
-    // PLACE ORDER
+    // PLACE ORDER - Fixed payment flow
     // ================================================================
 
     window.placeOrder = () => {
