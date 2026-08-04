@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Load Razorpay with proper error handling -->
+<script src="https://checkout.razorpay.com/v1/checkout.js" onerror="window.razorpayLoadError=true"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -491,6 +492,35 @@
 
     .modal-backdrop.flex {
         display: flex;
+    }
+
+    /* Payment button loading state */
+    .payment-btn-loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    /* WebView specific fixes */
+    .webview-safe {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* Razorpay iframe container fix for WebView */
+    .razorpay-checkout {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 99999 !important;
+        background: rgba(0,0,0,0.5) !important;
+    }
+
+    /* Ensure buttons work in WebView */
+    button, .clickable {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
     }
 </style>
 </head>
@@ -983,7 +1013,7 @@
 <!-- PAYMENT PROCESSING OVERLAY -->
 <div id="paymentProcessingOverlay">
     <div class="w-14 h-14 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
-    <p class="font-bold text-lg">Payment received — confirming your order...</p>
+    <p class="font-bold text-lg">Processing your payment...</p>
     <p class="text-sm text-white/70 mt-1">Please don't close this window.</p>
 </div>
 
@@ -1093,10 +1123,83 @@
     const db = getDatabase(app);
     const storage = getStorage(app);
 
+    // Razorpay configuration
     const RAZORPAY_KEY_ID = "rzp_live_B3ySltBTbQf0B4";
     const RAZORPAY_BUSINESS_NAME = "Oligo Microgreens";
     const IS_TEST_MODE = RAZORPAY_KEY_ID.startsWith('rzp_test_');
     
+    // Track if Razorpay loaded successfully
+    let razorpayLoaded = false;
+    let razorpayLoadAttempts = 0;
+    const MAX_RAZORPAY_ATTEMPTS = 3;
+
+    // Function to check and load Razorpay with retry
+    function ensureRazorpayLoaded(callback) {
+        if (typeof Razorpay !== 'undefined' && Razorpay) {
+            razorpayLoaded = true;
+            callback();
+            return;
+        }
+
+        // Check if we have a load error flag from script tag
+        if (window.razorpayLoadError) {
+            console.warn('Razorpay script failed to load initially, retrying...');
+            // Try loading again
+            loadRazorpayScript(callback);
+            return;
+        }
+
+        // If not loaded yet, wait for it
+        let checkInterval = setInterval(() => {
+            if (typeof Razorpay !== 'undefined' && Razorpay) {
+                razorpayLoaded = true;
+                clearInterval(checkInterval);
+                callback();
+            }
+        }, 200);
+
+        // Timeout after 8 seconds
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            if (!razorpayLoaded) {
+                console.warn('Razorpay not loaded after timeout, attempting manual load...');
+                loadRazorpayScript(callback);
+            }
+        }, 8000);
+    }
+
+    function loadRazorpayScript(callback) {
+        if (razorpayLoadAttempts >= MAX_RAZORPAY_ATTEMPTS) {
+            window.showToast("Payment gateway unavailable. Please use Cash on Delivery.", true);
+            callback();
+            return;
+        }
+
+        razorpayLoadAttempts++;
+        
+        // Remove existing script if any
+        const oldScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+        if (oldScript) oldScript.remove();
+
+        const script = document.createElement('script');
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = function() {
+            razorpayLoaded = true;
+            callback();
+        };
+        script.onerror = function() {
+            console.warn(`Razorpay load attempt ${razorpayLoadAttempts} failed`);
+            if (razorpayLoadAttempts < MAX_RAZORPAY_ATTEMPTS) {
+                setTimeout(() => loadRazorpayScript(callback), 1000);
+            } else {
+                window.showToast("Payment gateway unavailable. Please use Cash on Delivery.", true);
+                callback();
+            }
+        };
+        document.head.appendChild(script);
+    }
+
     function getFriendlyErrorMessage(error) {
         const code = error.code;
         if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') return "Incorrect email or password.";
@@ -1131,6 +1234,7 @@
     let currentPaymentMethod = 'cod';
     let appliedVoucher = null;
     let currentDiscount = 0;
+    let isPaymentInProgress = false;
 
     setTimeout(() => {
         const loader = document.getElementById('appLoader');
@@ -1211,8 +1315,14 @@
         toastTimeout = setTimeout(() => { t.classList.remove('show'); }, 3000);
     };
 
-    function showPaymentProcessing() { document.getElementById('paymentProcessingOverlay').classList.remove('hidden'); document.getElementById('paymentProcessingOverlay').classList.add('flex'); }
-    function hidePaymentProcessing() { document.getElementById('paymentProcessingOverlay').classList.add('hidden'); document.getElementById('paymentProcessingOverlay').classList.remove('flex'); }
+    function showPaymentProcessing() { 
+        document.getElementById('paymentProcessingOverlay').classList.remove('hidden'); 
+        document.getElementById('paymentProcessingOverlay').classList.add('flex'); 
+    }
+    function hidePaymentProcessing() { 
+        document.getElementById('paymentProcessingOverlay').classList.add('hidden'); 
+        document.getElementById('paymentProcessingOverlay').classList.remove('flex'); 
+    }
 
     function showOrderResult(opts) {
         const iconWrap = document.getElementById('orderResultIconWrap');
@@ -1352,34 +1462,66 @@
     };
 
     function openRazorpayCheckout({ amount, description, onSuccess, onDismiss }) {
-        if (typeof Razorpay === 'undefined') {
-            window.showToast("Payment gateway failed to load. Check your connection.", true);
-            return;
-        }
+        if (isPaymentInProgress) return;
         if (!amount || amount <= 0) {
             window.showToast("Nothing to pay.", true);
             return;
         }
-        const options = {
-            key: RAZORPAY_KEY_ID,
-            amount: Math.round(amount * 100),
-            currency: "INR",
-            name: RAZORPAY_BUSINESS_NAME,
-            description: description,
-            prefill: {
-                name: userLocalData?.name || "",
-                contact: userLocalData?.phone || "",
-                email: auth.currentUser?.email || ""
-            },
-            theme: { color: "#10b981" },
-            handler: function (response) { onSuccess(response); },
-            modal: { ondismiss: function () { if (onDismiss) onDismiss(); } }
-        };
-        const rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (resp) {
-            window.showToast("Payment failed: " + (resp.error?.description || "Please try again."), true);
+
+        isPaymentInProgress = true;
+
+        // Ensure Razorpay is loaded before proceeding
+        ensureRazorpayLoaded(() => {
+            if (!razorpayLoaded || typeof Razorpay === 'undefined') {
+                isPaymentInProgress = false;
+                window.showToast("Payment gateway unavailable. Please use Cash on Delivery or try again.", true);
+                if (onDismiss) onDismiss();
+                return;
+            }
+
+            try {
+                const options = {
+                    key: RAZORPAY_KEY_ID,
+                    amount: Math.round(amount * 100),
+                    currency: "INR",
+                    name: RAZORPAY_BUSINESS_NAME,
+                    description: description || "Oligo order",
+                    prefill: {
+                        name: userLocalData?.name || "",
+                        contact: userLocalData?.phone || "",
+                        email: auth.currentUser?.email || ""
+                    },
+                    theme: { color: "#10b981" },
+                    handler: function (response) {
+                        isPaymentInProgress = false;
+                        if (onSuccess) onSuccess(response);
+                    },
+                    modal: { 
+                        ondismiss: function () {
+                            isPaymentInProgress = false;
+                            if (onDismiss) onDismiss();
+                        }
+                    }
+                };
+
+                // For WebView, ensure the checkout opens properly
+                const rzp = new Razorpay(options);
+                
+                // Handle payment failure events
+                rzp.on('payment.failed', function (resp) {
+                    isPaymentInProgress = false;
+                    window.showToast("Payment failed: " + (resp.error?.description || "Please try again."), true);
+                });
+
+                // Open the checkout
+                rzp.open();
+            } catch (e) {
+                isPaymentInProgress = false;
+                console.error('Razorpay error:', e);
+                window.showToast("Payment gateway error. Please try again or use Cash on Delivery.", true);
+                if (onDismiss) onDismiss();
+            }
         });
-        rzp.open();
     }
 
     window.toggleDay = (btn, day) => {
@@ -1654,10 +1796,6 @@
         if (payBtn) { payBtn.classList.add('hidden'); payBtn.classList.remove('flex'); }
         document.getElementById('payTestModeHint').classList.add('hidden');
 
-        // No formal credit ledger doesn't mean no payment history — a customer
-        // who always pays upfront via Razorpay at checkout has no dues to
-        // track, but their actual order payments still exist in `orders` and
-        // are far more useful to show here than a bare "nothing found".
         const uid = auth.currentUser ? auth.currentUser.uid : null;
         const myPaidOrders = uid
             ? Object.entries(allOrdersData || {})
@@ -1952,6 +2090,11 @@
 
     window.placeOrder = () => {
         try {
+            if(isPaymentInProgress) {
+                window.showToast("Payment already in progress...", true);
+                return;
+            }
+
             if(!userLocalData || !userLocalData.phone) { window.showToast("Phone required.", true); window.closeCart(); window.navTo('viewProfile'); return; }
             if (basket.length === 0) return window.showToast("Basket empty.", true);
             const activeProducerId = localStorage.getItem('oligo_active_producer_id');
@@ -2105,7 +2248,8 @@
                     openRazorpayCheckout({
                         amount: amountToCharge,
                         description: "Oligo subscription — first delivery",
-                        onSuccess: (response) => saveSubscription(response)
+                        onSuccess: (response) => saveSubscription(response),
+                        onDismiss: () => { /* Cleanup if needed */ }
                     });
                 } else {
                     saveSubscription(null);
@@ -2118,13 +2262,19 @@
                     openRazorpayCheckout({
                         amount: amountToCharge,
                         description: "Oligo order",
-                        onSuccess: (response) => saveOneTimeOrder(reqDate, response)
+                        onSuccess: (response) => saveOneTimeOrder(reqDate, response),
+                        onDismiss: () => { /* Cleanup if needed */ }
                     });
                 } else {
                     saveOneTimeOrder(reqDate, null);
                 }
             }
-        } catch(e) { window.showToast("Error", true); }
+        } catch(e) { 
+            console.error('Order placement error:', e);
+            window.showToast("Error processing your order. Please try again.", true);
+            isPaymentInProgress = false;
+            hidePaymentProcessing();
+        }
     };
 
     window.switchOrderView = (view) => {
@@ -2409,9 +2559,6 @@
                 const nextDate = (s.status === 'ACTIVE' && s.frequency && s.frequency.length) ? getNextSubscriptionDate(s.frequency) : null;
                 const nextDateStr = nextDate ? new Date(nextDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : null;
 
-                // Last delivery actually received for this subscription — lets
-                // the customer see their delivery history at a glance instead
-                // of wondering "did my last order even arrive?"
                 const deliveredForThisSub = Object.values(allOrdersData || {})
                     .filter(o => o.subscriptionId === id && o.status === 'DELIVERED' && o.requestedDate)
                     .sort((a, b) => String(b.requestedDate).localeCompare(String(a.requestedDate)));
