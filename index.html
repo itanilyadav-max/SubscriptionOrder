@@ -8,8 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Load Razorpay with proper error handling -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -435,7 +433,32 @@
 
     .modal-backdrop.flex { display: flex; }
 
-    /* Payment overlay - full screen with proper header */
+    /* Payment redirect notice */
+    .payment-redirect-notice {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-top: 8px;
+        display: none;
+    }
+
+    .payment-redirect-notice.show {
+        display: block;
+    }
+
+    .payment-redirect-notice p {
+        font-size: 11px;
+        color: #92400e;
+        font-weight: 500;
+    }
+
+    .payment-redirect-notice .highlight {
+        font-weight: 700;
+        color: #78350f;
+    }
+
+    /* Payment WebView overlay - full screen for APK */
     #paymentWebViewOverlay {
         position: fixed;
         inset: 0;
@@ -494,6 +517,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    #paymentWebViewOverlay .content iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none;
+        background: white;
+    }
+
+    #paymentWebViewOverlay .content iframe.show {
+        display: block;
     }
 
     #paymentWebViewOverlay .content .loading-spinner {
@@ -606,28 +641,117 @@
         background: #cbd5e1;
     }
 
-    .payment-redirect-notice {
-        background: #fef3c7;
-        border: 1px solid #f59e0b;
-        border-radius: 12px;
-        padding: 12px 16px;
-        margin-top: 8px;
+    .payment-fallback-btn {
         display: none;
-    }
-
-    .payment-redirect-notice.show {
-        display: block;
-    }
-
-    .payment-redirect-notice p {
-        font-size: 11px;
-        color: #92400e;
-        font-weight: 500;
-    }
-
-    .payment-redirect-notice .highlight {
+        width: 100%;
+        padding: 16px;
+        background: #1e293b;
+        color: white;
+        border: none;
+        border-radius: 12px;
         font-weight: 700;
-        color: #78350f;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 8px 0;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .payment-fallback-btn.show {
+        display: flex;
+    }
+
+    .payment-fallback-btn:hover {
+        background: #0f172a;
+    }
+
+    .payment-fallback-btn .icon {
+        font-size: 18px;
+    }
+
+    /* COD confirmation */
+    #codConfirmModal {
+        position: fixed;
+        inset: 0;
+        height: 100vh;
+        height: 100dvh;
+        width: 100%;
+        z-index: 80;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    #codConfirmModal.flex {
+        display: flex;
+    }
+
+    #codConfirmModal .card {
+        width: 100%;
+        max-width: 380px;
+        background: white;
+        border-radius: 24px;
+        padding: 32px 24px;
+        text-align: center;
+    }
+
+    #codConfirmModal .card .icon {
+        font-size: 48px;
+        color: #f59e0b;
+        margin-bottom: 16px;
+    }
+
+    #codConfirmModal .card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    #codConfirmModal .card p {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    #codConfirmModal .card .btn-group {
+        display: flex;
+        gap: 12px;
+    }
+
+    #codConfirmModal .card .btn-group button {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    #codConfirmModal .card .btn-group .btn-confirm {
+        background: #10b981;
+        color: white;
+    }
+
+    #codConfirmModal .card .btn-group .btn-confirm:hover {
+        background: #059669;
+    }
+
+    #codConfirmModal .card .btn-group .btn-cancel {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    #codConfirmModal .card .btn-group .btn-cancel:hover {
+        background: #cbd5e1;
     }
 </style>
 </head>
@@ -695,7 +819,20 @@
     </div>
 </div>
 
-<!-- PAYMENT WEBVIEW OVERLAY - Using Razorpay Standard Checkout -->
+<!-- COD CONFIRMATION MODAL -->
+<div id="codConfirmModal">
+    <div class="card">
+        <div class="icon"><i class="fas fa-hand-holding-usd"></i></div>
+        <h3>Confirm Cash on Delivery</h3>
+        <p>You're placing an order with Cash on Delivery. Please confirm to proceed.</p>
+        <div class="btn-group">
+            <button class="btn-cancel" onclick="window.closeCODConfirm()">Cancel</button>
+            <button class="btn-confirm" onclick="window.confirmCODOrder()">Confirm Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- PAYMENT WEBVIEW OVERLAY -->
 <div id="paymentWebViewOverlay">
     <div class="header">
         <span class="title"><i class="fas fa-credit-card mr-2 text-green-600"></i>Secure Payment</span>
@@ -707,6 +844,9 @@
             <div class="spinner-circle"></div>
             <p>Loading secure payment page...</p>
         </div>
+        
+        <!-- Iframe for payment -->
+        <iframe id="paymentIframe" src=""></iframe>
         
         <!-- Status: Success -->
         <div class="payment-status" id="paymentSuccess">
@@ -1117,7 +1257,7 @@
 
                 <!-- Payment redirect notice -->
                 <div class="payment-redirect-notice" id="paymentRedirectNotice">
-                    <p><i class="fas fa-info-circle mr-1"></i> You'll be redirected to a secure payment page. <span class="highlight">Don't close the browser</span> — you'll be brought back automatically after payment.</p>
+                    <p><i class="fas fa-info-circle mr-1"></i> For online payments, you'll be redirected to a secure page. <span class="highlight">Don't close the browser</span> — you'll be brought back automatically.</p>
                 </div>
             </div>
 
@@ -1299,6 +1439,7 @@
     let currentDiscount = 0;
     let isPaymentInProgress = false;
     let pendingOrderData = null;
+    let isCODConfirm = false;
 
     // Helper functions
     function getFriendlyErrorMessage(error) {
@@ -1459,11 +1600,8 @@
     };
 
     // ================================================================
-    // PAYMENT FUNCTIONS - Using Razorpay Standard Checkout
+    // PAYMENT FUNCTIONS - Using Razorpay Checkout with redirect fallback
     // ================================================================
-
-    let paymentResolve = null;
-    let paymentReject = null;
 
     function openRazorpayCheckout({ amount, description, onSuccess, onDismiss }) {
         if (isPaymentInProgress) return;
@@ -1473,26 +1611,10 @@
             return;
         }
 
-        // Check if Razorpay is loaded
-        if (typeof Razorpay === 'undefined') {
-            window.showToast("Payment gateway loading... Please try again.", true);
-            // Try loading Razorpay dynamically
-            const script = document.createElement('script');
-            script.src = "https://checkout.razorpay.com/v1/checkout.js";
-            script.onload = function() {
-                openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
-            };
-            script.onerror = function() {
-                window.showToast("Failed to load payment gateway. Please use Cash on Delivery.", true);
-                if (onDismiss) onDismiss();
-            };
-            document.head.appendChild(script);
-            return;
-        }
-
         isPaymentInProgress = true;
         const overlay = document.getElementById('paymentWebViewOverlay');
         const loader = document.getElementById('paymentLoader');
+        const iframe = document.getElementById('paymentIframe');
         const successEl = document.getElementById('paymentSuccess');
         const errorEl = document.getElementById('paymentError');
 
@@ -1500,98 +1622,216 @@
         successEl.classList.remove('show');
         errorEl.classList.remove('show');
         loader.style.display = 'flex';
+        iframe.classList.remove('show');
+        iframe.src = '';
 
         // Show the overlay
         overlay.classList.add('show');
 
-        try {
-            const options = {
-                key: RAZORPAY_KEY_ID,
-                amount: Math.round(amount * 100),
-                currency: "INR",
-                name: RAZORPAY_BUSINESS_NAME,
-                description: description || "Oligo order",
-                prefill: {
-                    name: userLocalData?.name || "",
-                    contact: userLocalData?.phone || "",
-                    email: auth.currentUser?.email || ""
-                },
-                theme: { color: "#10b981" },
-                handler: function (response) {
-                    isPaymentInProgress = false;
-                    loader.style.display = 'none';
-                    // Show success
-                    successEl.classList.add('show');
-                    if (onSuccess) onSuccess(response);
-                },
-                modal: { 
-                    ondismiss: function () {
-                        isPaymentInProgress = false;
-                        loader.style.display = 'none';
-                        if (onDismiss) onDismiss();
-                        // Close overlay after a moment
-                        setTimeout(() => {
-                            overlay.classList.remove('show');
-                        }, 500);
-                    }
-                }
+        // Build the Razorpay checkout URL for redirect/iframe flow
+        // This is a more reliable approach for WebView
+        const checkoutUrl = new URL('https://checkout.razorpay.com/v1/checkout/embedded');
+        const params = {
+            key_id: RAZORPAY_KEY_ID,
+            amount: Math.round(amount * 100),
+            currency: 'INR',
+            name: RAZORPAY_BUSINESS_NAME,
+            description: description || 'Oligo order',
+            prefill_name: userLocalData?.name || '',
+            prefill_contact: userLocalData?.phone || '',
+            prefill_email: auth.currentUser?.email || '',
+            theme_color: '#10b981',
+            // Use the redirect method which works better in WebView
+            method: 'redirect'
+        };
+
+        // Add all params to URL
+        Object.keys(params).forEach(key => {
+            if (params[key]) {
+                checkoutUrl.searchParams.append(key, params[key]);
+            }
+        });
+
+        // Also try the standard checkout if the embedded doesn't work
+        const standardUrl = new URL('https://checkout.razorpay.com/v1/checkout');
+        standardUrl.searchParams.append('key', RAZORPAY_KEY_ID);
+        standardUrl.searchParams.append('amount', Math.round(amount * 100));
+        standardUrl.searchParams.append('currency', 'INR');
+        standardUrl.searchParams.append('name', RAZORPAY_BUSINESS_NAME);
+        standardUrl.searchParams.append('description', description || 'Oligo order');
+        if (userLocalData?.name) standardUrl.searchParams.append('prefill[name]', userLocalData.name);
+        if (userLocalData?.phone) standardUrl.searchParams.append('prefill[contact]', userLocalData.phone);
+        if (auth.currentUser?.email) standardUrl.searchParams.append('prefill[email]', auth.currentUser.email);
+
+        // Try embedded first, fallback to standard
+        let currentUrl = checkoutUrl.toString();
+        let retryCount = 0;
+
+        function loadPaymentUrl(url) {
+            loader.style.display = 'flex';
+            iframe.style.display = 'none';
+            iframe.src = url;
+            
+            iframe.onload = function() {
+                loader.style.display = 'none';
+                iframe.style.display = 'block';
+                iframe.classList.add('show');
             };
 
-            // For APK/WebView, we need to open Razorpay in a way that works
-            // The standard Razorpay modal should work in WebView if JavaScript is enabled
-            const rzp = new Razorpay(options);
-            
-            // Handle payment failure
-            rzp.on('payment.failed', function (resp) {
-                isPaymentInProgress = false;
+            iframe.onerror = function() {
                 loader.style.display = 'none';
-                errorEl.classList.add('show');
-                document.getElementById('paymentErrorMsg').innerText = 
-                    resp.error?.description || "Payment failed. Please try again.";
-            });
-
-            // Open the checkout
-            rzp.open();
-            
-            // Hide loader after a moment (Razorpay modal will show)
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 1000);
-
-        } catch (e) {
-            console.error('Razorpay error:', e);
-            isPaymentInProgress = false;
-            loader.style.display = 'none';
-            errorEl.classList.add('show');
-            document.getElementById('paymentErrorMsg').innerText = 
-                "Payment gateway error. Please try again or use Cash on Delivery.";
+                if (retryCount < 2) {
+                    retryCount++;
+                    // Try standard URL as fallback
+                    if (currentUrl === checkoutUrl.toString()) {
+                        currentUrl = standardUrl.toString();
+                        loadPaymentUrl(currentUrl);
+                    } else {
+                        showPaymentError('Failed to load payment page. Please check your connection.');
+                    }
+                } else {
+                    showPaymentError('Failed to load payment page. Please check your connection.');
+                }
+            };
         }
+
+        loadPaymentUrl(currentUrl);
+
+        // Store payment data for callback
+        pendingOrderData = {
+            amount,
+            description,
+            onSuccess,
+            onDismiss
+        };
+
+        // Listen for URL changes in the iframe (for redirect-based flow)
+        let urlCheckInterval = setInterval(() => {
+            try {
+                const iframeUrl = iframe.contentWindow?.location?.href;
+                if (iframeUrl) {
+                    // Check for success - look for payment ID in URL
+                    if (iframeUrl.includes('razorpay.com') && iframeUrl.includes('payment_id')) {
+                        const paymentId = new URL(iframeUrl).searchParams.get('payment_id');
+                        if (paymentId) {
+                            clearInterval(urlCheckInterval);
+                            handlePaymentSuccess({ razorpay_payment_id: paymentId });
+                        }
+                    }
+                    // Check for failure
+                    if (iframeUrl.includes('error') || iframeUrl.includes('failed') || iframeUrl.includes('cancel')) {
+                        clearInterval(urlCheckInterval);
+                        handlePaymentFailure('Payment was cancelled or declined.');
+                    }
+                }
+            } catch (e) {
+                // Cross-origin, cannot access iframe URL - this is normal
+            }
+        }, 3000);
+
+        // Also listen for postMessage events
+        function messageHandler(event) {
+            try {
+                const data = event.data;
+                if (data && typeof data === 'object') {
+                    if (data.type === 'razorpay_payment' && data.status === 'success') {
+                        clearInterval(urlCheckInterval);
+                        window.removeEventListener('message', messageHandler);
+                        handlePaymentSuccess({ razorpay_payment_id: data.payment_id || data.razorpay_payment_id });
+                    } else if (data.type === 'razorpay_payment' && data.status === 'failed') {
+                        clearInterval(urlCheckInterval);
+                        window.removeEventListener('message', messageHandler);
+                        handlePaymentFailure(data.message || 'Payment failed.');
+                    }
+                }
+            } catch (e) {}
+        }
+        window.addEventListener('message', messageHandler);
+
+        // Cleanup function
+        window._paymentCleanup = function() {
+            clearInterval(urlCheckInterval);
+            window.removeEventListener('message', messageHandler);
+        };
+    }
+
+    function handlePaymentSuccess(response) {
+        isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
+
+        const successEl = document.getElementById('paymentSuccess');
+        successEl.classList.add('show');
+
+        if (pendingOrderData && pendingOrderData.onSuccess) {
+            pendingOrderData.onSuccess(response);
+        }
+
+        setTimeout(() => {
+            window.closePaymentWebView(true);
+        }, 3000);
+    }
+
+    function handlePaymentFailure(message) {
+        isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
+        showPaymentError(message || 'Payment failed. Please try again.');
+    }
+
+    function showPaymentError(message) {
+        const errorEl = document.getElementById('paymentError');
+        document.getElementById('paymentErrorMsg').innerText = message || 'There was an issue processing your payment.';
+        errorEl.classList.add('show');
     }
 
     window.closePaymentWebView = (success = false) => {
         const overlay = document.getElementById('paymentWebViewOverlay');
         overlay.classList.remove('show');
-        
-        const successEl = document.getElementById('paymentSuccess');
-        const errorEl = document.getElementById('paymentError');
-        successEl.classList.remove('show');
-        errorEl.classList.remove('show');
-        
+
+        const iframe = document.getElementById('paymentIframe');
+        iframe.src = '';
+        iframe.classList.remove('show');
+
+        if (!success && pendingOrderData && pendingOrderData.onDismiss) {
+            pendingOrderData.onDismiss();
+        }
+
+        pendingOrderData = null;
         isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
     };
 
     window.retryPayment = () => {
-        const errorEl = document.getElementById('paymentError');
-        errorEl.classList.remove('show');
-        
+        document.getElementById('paymentError').classList.remove('show');
         if (pendingOrderData) {
             const { amount, description, onSuccess, onDismiss } = pendingOrderData;
             openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
         }
     };
 
+    // COD confirmation
+    window.openCODConfirm = (callback) => {
+        isCODConfirm = true;
+        document.getElementById('codConfirmModal').classList.add('flex');
+        window._codCallback = callback;
+    };
+
+    window.closeCODConfirm = () => {
+        document.getElementById('codConfirmModal').classList.remove('flex');
+        isCODConfirm = false;
+        window._codCallback = null;
+    };
+
+    window.confirmCODOrder = () => {
+        document.getElementById('codConfirmModal').classList.remove('flex');
+        isCODConfirm = false;
+        if (window._codCallback) {
+            window._codCallback();
+            window._codCallback = null;
+        }
+    };
+
     function processPayment({ amount, description, onSuccess, onDismiss }) {
-        pendingOrderData = { amount, description, onSuccess, onDismiss };
+        // For APK/WebView, use the iframe-based checkout
         openRazorpayCheckout({ amount, description, onSuccess, onDismiss });
     }
 
@@ -2024,7 +2264,10 @@
                         onDismiss: () => {}
                     });
                 } else {
-                    saveSubscription(null);
+                    // For COD, show confirmation modal
+                    window.openCODConfirm(() => {
+                        saveSubscription(null);
+                    });
                 }
             } else {
                 const reqDate = document.getElementById('checkoutDate').value;
@@ -2038,7 +2281,10 @@
                         onDismiss: () => {}
                     });
                 } else {
-                    saveOneTimeOrder(reqDate, null);
+                    // For COD, show confirmation modal
+                    window.openCODConfirm(() => {
+                        saveOneTimeOrder(reqDate, null);
+                    });
                 }
             }
         } catch(e) {
