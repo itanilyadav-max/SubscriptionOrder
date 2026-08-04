@@ -8,8 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Oligo - Fresh Microgreens</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Load Razorpay with proper error handling -->
-<script src="https://checkout.razorpay.com/v1/checkout.js" onerror="window.razorpayLoadError=true"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -34,9 +32,8 @@
         bottom: 0;
     }
 
-    /* FULL SCREEN FIX - Use 100dvh for dynamic viewport height */
     #mainApp, #authSection {
-        height: 100vh; /* fallback */
+        height: 100vh;
         height: 100dvh;
         max-height: 100vh;
         max-height: 100dvh;
@@ -47,46 +44,37 @@
         position: relative;
     }
 
-    /* SAFE-AREA (notch / Dynamic Island / home-indicator) PADDING */
     .pt-safe { padding-top: max(env(safe-area-inset-top), 8px); }
     .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 4px); }
     .pl-safe { padding-left: max(env(safe-area-inset-left), 12px); }
     .pr-safe { padding-right: max(env(safe-area-inset-right), 12px); }
     
-    /* SCROLLBAR HIDING */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* ANIMATIONS */
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
     .nav-active { color: #10b981; }
     
-    /* CARDS */
     .product-card { transition: all 0.3s ease; border: 1px solid #f3f4f6; }
     .product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
     .modern-card { background: white; border-radius: 32px; border: 1px solid #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
 
-    /* CATEGORY PILLS */
     .cat-pill { transition: all 0.2s ease; white-space: nowrap; border: 1px solid #e5e7eb; background: white; color: #6b7280; padding: 6px 16px; border-radius: 9999px; font-size: 13px; }
     .cat-pill.active { background-color: #10b981; color: white !important; border-color: #10b981; font-weight: 600; }
     
-    /* LOADER */
     #appLoader { position: fixed; inset: 0; background: white; z-index: 9000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #10b981; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* BUTTONS & BADGES */
     .btn-dark { background-color: #0f172a; color: white; border-radius: 16px; font-weight: 700; transition: all 0.2s; }
     .btn-dark:hover { background-color: #000; transform: scale(1.02); }
     .status-badge { font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 99px; text-transform: uppercase; }
 
-    /* SUBSCRIPTION TOGGLES */
     .day-btn { border: 1px solid #e5e7eb; color: #6b7280; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; transition: all 0.2s; }
     .day-btn.selected { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3); }
 
-    /* SEARCH RESULTS */
     .search-results { position: absolute; left: 0; right: 0; top: 100%; background: white; border: 1px solid #e2e8f0; border-radius: 16px; margin-top: 5px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); z-index: 100; max-height: 250px; overflow-y: auto; }
     .search-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; align-items: start; gap: 12px; transition: background 0.2s; }
     .search-item:last-child { border-bottom: none; }
@@ -96,14 +84,12 @@
     .search-item .name { font-weight: 700; font-size: 13px; color: #1e293b; line-height: 1.2; }
     .search-item .addr { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-    /* HOLIDAY ANIMATION */
     @keyframes blink-red {
         0%, 100% { background-color: #fee2e2; border-color: #ef4444; }
         50% { background-color: #fecaca; border-color: #f87171; }
     }
     .holiday-alert { animation: blink-red 2s infinite; border: 1px solid #ef4444; }
 
-    /* TOAST NOTIFICATION */
     #toast {
         position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translate(0, -20px);
         z-index: 9999; padding: 12px 24px; border-radius: 99px; font-size: 13px; font-weight: 600;
@@ -112,11 +98,9 @@
     }
     #toast.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
 
-    /* CALENDAR STYLES */
     input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; filter: invert(0.5); }
     input[type="date"] { position: relative; }
     
-    /* CUSTOM VISUAL CALENDAR */
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 10px; font-weight: 600; }
     .cal-header { font-size: 10px; font-weight: bold; color: #9ca3af; text-align: center; padding-bottom: 4px; text-transform: uppercase; }
@@ -124,7 +108,6 @@
     
     .cal-day.delivery { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; cursor: pointer; }
     .cal-day.delivery:hover { background-color: #2563eb; color: white; }
-    
     .cal-day.holiday { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; opacity: 0.8; cursor: not-allowed; }
     .cal-day.skipped { background-color: #fff7ed; color: #c2410c; border: 1px dashed #fdba74; text-decoration: line-through; opacity: 0.8; }
     .cal-day.added { background-color: #f3e8ff; color: #7e22ce; border: 1px solid #d8b4fe; font-weight: 800; }
@@ -132,32 +115,25 @@
     .cal-day.normal:hover { background-color: #f3f4f6; border-color: #e5e7eb; }
     .cal-day.out-of-range { color: #d1d5db; background-color: transparent; border: 1px solid transparent; opacity: 0.4; pointer-events: none; }
 
-    /* SEGMENTED PILL TAB SWITCHER (Orders/Subscriptions) */
     .seg-switcher { background: #f1f5f9; border-radius: 16px; padding: 4px; display: flex; gap: 4px; }
     .seg-btn { flex: 1; text-align: center; padding: 10px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #6b7280; transition: all 0.2s ease; }
     .seg-btn.active { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16,185,129,0.3); }
 
-    /* ITEM CHIPS */
     .item-chip { display: inline-flex; align-items: center; background: #f8fafc; border: 1px solid #eef2f7; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; margin: 2px 4px 2px 0; }
 
-    /* PAYMENT METHOD PILLS */
     .pm-btn { border: 1px solid #e5e7eb; background: white; color: #6b7280; padding: 12px 10px; border-radius: 14px; font-size: 12px; font-weight: 700; text-align: center; transition: all 0.2s ease; cursor: pointer; }
     .pm-btn.active { background-color: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 4px 10px rgba(15,23,42,0.25); }
 
-    /* TAP-FRIENDLY ACTION BUTTONS */
     .action-btn { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border-radius: 999px; font-size: 12px; font-weight: 700; transition: all 0.15s ease; }
     .action-btn:active { transform: scale(0.95); }
 
-    /* SKELETON LOADERS */
     .skel { background: linear-gradient(90deg, #f1f5f9 25%, #e9edf2 37%, #f1f5f9 63%); background-size: 400% 100%; animation: skel-shine 1.4s ease infinite; border-radius: 12px; }
     @keyframes skel-shine { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
     .skel-card { border-radius: 32px; border: 1px solid #f1f5f9; padding: 24px; background: white; }
 
-    /* EMPTY STATES */
     .empty-state { text-align: center; padding: 56px 20px; }
     .empty-state .icon-wrap { width: 64px; height: 64px; border-radius: 24px; background: #f0fdf4; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
 
-    /* MAIN LAYOUT - FULL SCREEN FIX */
     .app-wrapper {
         height: 100vh;
         height: 100dvh;
@@ -169,7 +145,6 @@
         position: relative;
     }
 
-    /* Content area - takes remaining height */
     .content-area {
         flex: 1;
         overflow-y: auto;
@@ -178,7 +153,6 @@
         padding-bottom: 4px;
     }
 
-    /* Mobile nav - fixed at bottom with proper safe area */
     .mobile-nav {
         flex-shrink: 0;
         background: white;
@@ -195,7 +169,6 @@
         min-height: 64px;
     }
 
-    /* Mobile header */
     .mobile-header {
         flex-shrink: 0;
         background: rgba(255,255,255,0.92);
@@ -209,7 +182,6 @@
         min-height: 60px;
     }
 
-    /* Ensure modals are full height */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -231,7 +203,6 @@
         padding: 24px 24px max(env(safe-area-inset-bottom), 24px) 24px;
     }
 
-    /* Auth section full screen */
     #authSection {
         position: fixed;
         inset: 0;
@@ -248,11 +219,8 @@
         overflow-y: auto;
     }
 
-    #authSection.flex {
-        display: flex;
-    }
+    #authSection.flex { display: flex; }
 
-    /* Fix for desktop sidebar */
     .desktop-sidebar {
         height: 100vh;
         height: 100dvh;
@@ -265,15 +233,10 @@
     }
 
     @media (min-width: 1024px) {
-        .desktop-sidebar {
-            display: flex;
-        }
-        .mobile-header, .mobile-nav {
-            display: none !important;
-        }
+        .desktop-sidebar { display: flex; }
+        .mobile-header, .mobile-nav { display: none !important; }
     }
 
-    /* Cart modal fix */
     #cartModal {
         position: fixed;
         inset: 0;
@@ -289,9 +252,7 @@
         align-items: center;
     }
 
-    #cartModal.flex {
-        display: flex;
-    }
+    #cartModal.flex { display: flex; }
 
     .cart-sheet {
         width: 100%;
@@ -304,7 +265,6 @@
         padding: 24px 24px max(env(safe-area-inset-bottom), 24px) 24px;
     }
 
-    /* Fix for subscription modal */
     .sub-modal {
         position: fixed;
         inset: 0;
@@ -320,9 +280,7 @@
         align-items: center;
     }
 
-    .sub-modal.flex {
-        display: flex;
-    }
+    .sub-modal.flex { display: flex; }
 
     .sub-sheet {
         width: 100%;
@@ -335,7 +293,6 @@
         padding: 24px 24px max(env(safe-area-inset-bottom), 24px) 24px;
     }
 
-    /* Recovery modal */
     .recovery-overlay {
         position: fixed;
         inset: 0;
@@ -352,9 +309,7 @@
         padding: 20px;
     }
 
-    .recovery-overlay.flex {
-        display: flex;
-    }
+    .recovery-overlay.flex { display: flex; }
 
     .recovery-card {
         width: 100%;
@@ -365,7 +320,6 @@
         position: relative;
     }
 
-    /* Fix for payment overlay */
     #paymentProcessingOverlay {
         position: fixed;
         inset: 0;
@@ -383,11 +337,8 @@
         padding: 20px;
     }
 
-    #paymentProcessingOverlay.flex {
-        display: flex;
-    }
+    #paymentProcessingOverlay.flex { display: flex; }
 
-    /* Result modal */
     #orderResultModal {
         position: fixed;
         inset: 0;
@@ -403,9 +354,7 @@
         padding: 20px;
     }
 
-    #orderResultModal.flex {
-        display: flex;
-    }
+    #orderResultModal.flex { display: flex; }
 
     .result-card {
         width: 100%;
@@ -416,7 +365,6 @@
         text-align: center;
     }
 
-    /* Fix for main app wrapper when logged in */
     #mainApp {
         display: none;
         height: 100vh;
@@ -427,11 +375,8 @@
         background: #f9fafb;
     }
 
-    #mainApp.flex {
-        display: flex;
-    }
+    #mainApp.flex { display: flex; }
 
-    /* Scrollable content inside main area */
     .main-content {
         flex: 1;
         overflow-y: auto;
@@ -444,12 +389,9 @@
     }
 
     @media (min-width: 1024px) {
-        .main-content {
-            padding: 24px 32px 8px 32px;
-        }
+        .main-content { padding: 24px 32px 8px 32px; }
     }
 
-    /* Desktop layout */
     .desktop-layout {
         display: flex;
         height: 100vh;
@@ -474,7 +416,6 @@
         padding: 20px 32px 8px 32px;
     }
 
-    /* Fix for all modals to use full height */
     .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -490,37 +431,362 @@
         align-items: center;
     }
 
-    .modal-backdrop.flex {
+    .modal-backdrop.flex { display: flex; }
+
+    /* WebView specific payment styles */
+    .payment-redirect-notice {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: none;
+    }
+
+    .payment-redirect-notice.show {
+        display: block;
+    }
+
+    .payment-redirect-notice p {
+        font-size: 12px;
+        color: #92400e;
+        font-weight: 500;
+    }
+
+    .payment-redirect-notice .highlight {
+        font-weight: 700;
+        color: #78350f;
+    }
+
+    .payment-loader {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f3f4f6;
+        border-radius: 12px;
+        margin: 8px 0;
+    }
+
+    .payment-loader.show {
         display: flex;
     }
 
-    /* Payment button loading state */
-    .payment-btn-loading {
-        opacity: 0.7;
-        pointer-events: none;
+    .payment-loader .loader-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse-dot 1.2s ease-in-out infinite;
     }
 
-    /* WebView specific fixes */
-    .webview-safe {
-        -webkit-user-select: none;
-        user-select: none;
+    .payment-loader .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .payment-loader .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse-dot {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+        40% { transform: scale(1); opacity: 1; }
     }
 
-    /* Razorpay iframe container fix for WebView */
-    .razorpay-checkout {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        z-index: 99999 !important;
-        background: rgba(0,0,0,0.5) !important;
+    /* WebView iframe container fix */
+    .payment-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        display: none;
     }
 
-    /* Ensure buttons work in WebView */
-    button, .clickable {
+    .payment-container.show {
+        display: block;
+    }
+
+    .payment-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        min-height: 400px;
+    }
+
+    .payment-close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
+        background: rgba(255,255,255,0.95);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-size: 16px;
+        color: #374151;
+    }
+
+    .payment-close-btn:hover {
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* UPI intent fallback */
+    .upi-intent-btn {
+        display: none;
+        width: 100%;
+        padding: 16px;
+        background: #1a1a2e;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 8px 0;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .upi-intent-btn.show {
+        display: flex;
+    }
+
+    .upi-intent-btn:hover {
+        background: #16213e;
+    }
+
+    .upi-intent-btn .app-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #1a1a2e;
+    }
+
+    /* Mobile-specific payment overlay */
+    #paymentWebViewOverlay {
+        position: fixed;
+        inset: 0;
+        height: 100vh;
+        height: 100dvh;
+        width: 100%;
+        z-index: 80;
+        background: white;
+        display: none;
+        flex-direction: column;
+        padding: 0;
+    }
+
+    #paymentWebViewOverlay.show {
+        display: flex;
+    }
+
+    #paymentWebViewOverlay .header {
+        padding: 16px 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    #paymentWebViewOverlay .header .title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1e293b;
+    }
+
+    #paymentWebViewOverlay .header .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #64748b;
+        cursor: pointer;
+        padding: 4px 8px;
+    }
+
+    #paymentWebViewOverlay .content {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #paymentWebViewOverlay .content iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    #paymentWebViewOverlay .content .loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    #paymentWebViewOverlay .content .loading-spinner .spinner-circle {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    #paymentWebViewOverlay .content .loading-spinner p {
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .payment-success-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.95);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        padding: 40px;
+    }
+
+    .payment-success-overlay.show {
+        display: flex;
+    }
+
+    .payment-success-overlay .check-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+
+    .payment-success-overlay h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .payment-success-overlay p {
+        color: #64748b;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .payment-success-overlay .btn-continue {
+        padding: 12px 32px;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .payment-error-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.95);
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        padding: 40px;
+    }
+
+    .payment-error-overlay.show {
+        display: flex;
+    }
+
+    .payment-error-overlay .error-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+
+    .payment-error-overlay h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .payment-error-overlay p {
+        color: #64748b;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .payment-error-overlay .btn-retry {
+        padding: 12px 32px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    .payment-error-overlay .btn-cancel {
+        padding: 12px 32px;
+        background: #e2e8f0;
+        color: #475569;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* Ensure payment modal appears on top */
+    #paymentWebViewOverlay {
+        z-index: 99999;
+    }
+
+    /* Safe area for payment overlay */
+    #paymentWebViewOverlay .header {
+        padding-top: max(env(safe-area-inset-top), 16px);
+    }
+
+    #paymentWebViewOverlay .content {
+        padding-bottom: env(safe-area-inset-bottom);
     }
 </style>
 </head>
@@ -584,6 +850,40 @@
             <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Registered Email</label>
             <input type="email" id="recInputEmail" placeholder="Enter your email" class="w-full p-3 bg-gray-50 rounded-xl outline-none ring-1 ring-gray-100 focus:ring-2 focus:ring-green-500 text-sm mb-4">
             <button onclick="window.sendResetLink()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">Send Reset Link</button>
+        </div>
+    </div>
+</div>
+
+<!-- PAYMENT WEBVIEW OVERLAY (for APK compatibility) -->
+<div id="paymentWebViewOverlay">
+    <div class="header">
+        <span class="title"><i class="fas fa-credit-card mr-2 text-green-600"></i>Secure Payment</span>
+        <button class="close-btn" onclick="window.closePaymentWebView()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="content" id="paymentIframeContainer">
+        <div class="loading-spinner" id="paymentIframeLoader">
+            <div class="spinner-circle"></div>
+            <p>Loading payment gateway...</p>
+        </div>
+        <iframe id="paymentIframe" src="" style="display:none;"></iframe>
+        
+        <!-- Success overlay -->
+        <div class="payment-success-overlay" id="paymentSuccessOverlay">
+            <div class="check-icon"><i class="fas fa-check"></i></div>
+            <h3>Payment Successful!</h3>
+            <p>Your payment has been processed. We're confirming your order.</p>
+            <button class="btn-continue" onclick="window.closePaymentWebView(true)">Continue</button>
+        </div>
+        
+        <!-- Error overlay -->
+        <div class="payment-error-overlay" id="paymentErrorOverlay">
+            <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Payment Failed</h3>
+            <p id="paymentErrorMsg">There was an issue processing your payment. Please try again.</p>
+            <div>
+                <button class="btn-retry" onclick="window.retryPayment()">Retry</button>
+                <button class="btn-cancel" onclick="window.closePaymentWebView(false)">Cancel</button>
+            </div>
         </div>
     </div>
 </div>
@@ -971,6 +1271,11 @@
                     <p><span class="font-bold">UPI (success):</span> success@razorpay</p>
                     <p><span class="font-bold">UPI (fail):</span> failure@razorpay</p>
                 </div>
+
+                <!-- Payment redirect notice for WebView -->
+                <div class="payment-redirect-notice" id="paymentRedirectNotice">
+                    <p><i class="fas fa-info-circle mr-1"></i> You'll be redirected to a secure payment page. <span class="highlight">Don't close the browser</span> — you'll be brought back automatically after payment.</p>
+                </div>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-2xl">
@@ -1123,106 +1428,21 @@
     const db = getDatabase(app);
     const storage = getStorage(app);
 
-    // Razorpay configuration
     const RAZORPAY_KEY_ID = "rzp_live_B3ySltBTbQf0B4";
     const RAZORPAY_BUSINESS_NAME = "Oligo Microgreens";
     const IS_TEST_MODE = RAZORPAY_KEY_ID.startsWith('rzp_test_');
-    
-    // Track if Razorpay loaded successfully
-    let razorpayLoaded = false;
-    let razorpayLoadAttempts = 0;
-    const MAX_RAZORPAY_ATTEMPTS = 3;
 
-    // Function to check and load Razorpay with retry
-    function ensureRazorpayLoaded(callback) {
-        if (typeof Razorpay !== 'undefined' && Razorpay) {
-            razorpayLoaded = true;
-            callback();
-            return;
-        }
-
-        // Check if we have a load error flag from script tag
-        if (window.razorpayLoadError) {
-            console.warn('Razorpay script failed to load initially, retrying...');
-            // Try loading again
-            loadRazorpayScript(callback);
-            return;
-        }
-
-        // If not loaded yet, wait for it
-        let checkInterval = setInterval(() => {
-            if (typeof Razorpay !== 'undefined' && Razorpay) {
-                razorpayLoaded = true;
-                clearInterval(checkInterval);
-                callback();
-            }
-        }, 200);
-
-        // Timeout after 8 seconds
-        setTimeout(() => {
-            clearInterval(checkInterval);
-            if (!razorpayLoaded) {
-                console.warn('Razorpay not loaded after timeout, attempting manual load...');
-                loadRazorpayScript(callback);
-            }
-        }, 8000);
-    }
-
-    function loadRazorpayScript(callback) {
-        if (razorpayLoadAttempts >= MAX_RAZORPAY_ATTEMPTS) {
-            window.showToast("Payment gateway unavailable. Please use Cash on Delivery.", true);
-            callback();
-            return;
-        }
-
-        razorpayLoadAttempts++;
-        
-        // Remove existing script if any
-        const oldScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-        if (oldScript) oldScript.remove();
-
-        const script = document.createElement('script');
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        script.async = true;
-        script.onload = function() {
-            razorpayLoaded = true;
-            callback();
-        };
-        script.onerror = function() {
-            console.warn(`Razorpay load attempt ${razorpayLoadAttempts} failed`);
-            if (razorpayLoadAttempts < MAX_RAZORPAY_ATTEMPTS) {
-                setTimeout(() => loadRazorpayScript(callback), 1000);
-            } else {
-                window.showToast("Payment gateway unavailable. Please use Cash on Delivery.", true);
-                callback();
-            }
-        };
-        document.head.appendChild(script);
-    }
-
-    function getFriendlyErrorMessage(error) {
-        const code = error.code;
-        if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') return "Incorrect email or password.";
-        if (code === 'auth/email-already-in-use') return "This email is already registered.";
-        if (code === 'auth/weak-password') return "Password must be at least 6 characters.";
-        if (code === 'auth/invalid-email') return "Invalid email address format.";
-        return error.message || "An error occurred. Try again.";
-    }
-
-    let userLocalData = null; 
+    // State variables
+    let userLocalData = null;
     let basket = [];
-    try {
-         basket = JSON.parse(localStorage.getItem('oligo_basket')) || [];
-    } catch(e) {
-         basket = [];
-    }
+    try { basket = JSON.parse(localStorage.getItem('oligo_basket')) || []; } catch(e) { basket = []; }
 
     let menuData = {};
-    let allOrdersData = {}; 
+    let allOrdersData = {};
     let allSubsData = {};
     let holidaysData = {};
-    let editingOrderId = null; 
-    let currentDeliveryFee = 0; 
+    let editingOrderId = null;
+    let currentDeliveryFee = 0;
     let currentDeliveryMethod = "Standard";
     let selectedSubscriptionDays = [];
     let currentManagingSubId = null;
@@ -1235,35 +1455,31 @@
     let appliedVoucher = null;
     let currentDiscount = 0;
     let isPaymentInProgress = false;
+    let pendingOrderData = null;
+    let paymentCallback = null;
 
-    setTimeout(() => {
-        const loader = document.getElementById('appLoader');
-        if(loader && loader.style.display !== 'none') {
-            // Safety fallback
-        }
-    }, 8000);
+    // Helper functions
+    function getFriendlyErrorMessage(error) {
+        const code = error.code;
+        if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') return "Incorrect email or password.";
+        if (code === 'auth/email-already-in-use') return "This email is already registered.";
+        if (code === 'auth/weak-password') return "Password must be at least 6 characters.";
+        if (code === 'auth/invalid-email') return "Invalid email address format.";
+        return error.message || "An error occurred. Try again.";
+    }
 
     function getNextSubscriptionDate(selectedDays) {
         const dayMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
         let checkDate = new Date();
-        checkDate.setDate(checkDate.getDate()); 
-
         let attempts = 0;
         while (attempts < 60) {
             const dayIndex = checkDate.getDay();
             const dayName = Object.keys(dayMap).find(key => dayMap[key] === dayIndex);
-            
-            const year = checkDate.getFullYear();
-            const month = String(checkDate.getMonth() + 1).padStart(2, '0');
-            const day = String(checkDate.getDate()).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
-            
+            const dateStr = checkDate.toISOString().split('T')[0];
             const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
-
             if (dayIndex !== 0 && !isHoliday && selectedDays.includes(dayName)) {
                 return dateStr;
             }
-
             checkDate.setDate(checkDate.getDate() + 1);
             attempts++;
         }
@@ -1277,10 +1493,10 @@
         let attempts = 0;
         while (!isValid && attempts < 30) {
             attempts++;
-            const dayOfWeek = checkDate.getDay(); 
+            const dayOfWeek = checkDate.getDay();
             const dateStr = checkDate.toISOString().split('T')[0];
             const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
-            if (dayOfWeek === 0 || isHoliday) { checkDate.setDate(checkDate.getDate() + 1); } 
+            if (dayOfWeek === 0 || isHoliday) { checkDate.setDate(checkDate.getDate() + 1); }
             else { isValid = true; }
         }
         return checkDate.toISOString().split('T')[0];
@@ -1288,42 +1504,27 @@
 
     function saveBasket() { localStorage.setItem('oligo_basket', JSON.stringify(basket)); updateBadge(); }
 
-    window.navTo = (id) => {
-        ['viewHome', 'viewMenu', 'viewOrders', 'viewProfile', 'viewPayments', 'viewComplaints'].forEach(v => {
-            const el = document.getElementById(v); if(el) el.classList.add('hidden');
-            const mBtn = document.getElementById('nav-' + v); if(mBtn) mBtn.classList.remove('nav-active');
-            const dBtn = document.getElementById('desk-nav-' + v);
-            if(dBtn) { dBtn.classList.remove('nav-active', 'bg-green-50', 'text-green-700'); dBtn.classList.add('text-gray-600', 'hover:bg-gray-50'); }
-        });
-        
-        const target = document.getElementById(id);
-        if(target) target.classList.remove('hidden');
-        
-        const activeMNav = document.getElementById('nav-' + id); if(activeMNav) activeMNav.classList.add('nav-active');
-        const activeDNav = document.getElementById('desk-nav-' + id);
-        if(activeDNav) { activeDNav.classList.remove('text-gray-600', 'hover:bg-gray-50'); activeDNav.classList.add('nav-active', 'bg-green-50', 'text-green-700'); }
-        
-        window.scrollTo(0,0);
-        if(id === 'viewPayments') fetchPayments();
-    };
-
+    // Toast notification
     let toastTimeout;
     window.showToast = (m, isError = false) => {
-        const t = document.getElementById('toast'); if(toastTimeout) clearTimeout(toastTimeout);
+        const t = document.getElementById('toast');
+        if (toastTimeout) clearTimeout(toastTimeout);
         t.innerText = m;
         t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-xs font-bold shadow-xl text-center transition-all duration-300 show ${isError ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`;
         toastTimeout = setTimeout(() => { t.classList.remove('show'); }, 3000);
     };
 
-    function showPaymentProcessing() { 
-        document.getElementById('paymentProcessingOverlay').classList.remove('hidden'); 
-        document.getElementById('paymentProcessingOverlay').classList.add('flex'); 
+    // Show/hide processing overlay
+    function showPaymentProcessing() {
+        document.getElementById('paymentProcessingOverlay').classList.remove('hidden');
+        document.getElementById('paymentProcessingOverlay').classList.add('flex');
     }
-    function hidePaymentProcessing() { 
-        document.getElementById('paymentProcessingOverlay').classList.add('hidden'); 
-        document.getElementById('paymentProcessingOverlay').classList.remove('flex'); 
+    function hidePaymentProcessing() {
+        document.getElementById('paymentProcessingOverlay').classList.add('hidden');
+        document.getElementById('paymentProcessingOverlay').classList.remove('flex');
     }
 
+    // Show order result modal
     function showOrderResult(opts) {
         const iconWrap = document.getElementById('orderResultIconWrap');
         const icon = document.getElementById('orderResultIcon');
@@ -1344,7 +1545,10 @@
         const primaryBtn = document.getElementById('orderResultPrimaryBtn');
         primaryBtn.innerText = opts.primaryLabel || "View My Orders";
         primaryBtn.className = `w-full ${isSuccess ? 'bg-green-600' : 'bg-gray-900'} text-white py-3.5 rounded-2xl font-bold active:scale-[0.98] transition`;
-        primaryBtn.onclick = () => { window.closeOrderResultModal(); if (opts.onPrimary) opts.onPrimary(); };
+        primaryBtn.onclick = () => {
+            window.closeOrderResultModal();
+            if (opts.onPrimary) opts.onPrimary();
+        };
 
         document.getElementById('orderResultModal').classList.remove('hidden');
         document.getElementById('orderResultModal').classList.add('flex');
@@ -1354,47 +1558,264 @@
         document.getElementById('orderResultModal').classList.remove('flex');
     };
 
+    // Navigation
+    window.navTo = (id) => {
+        ['viewHome', 'viewMenu', 'viewOrders', 'viewProfile', 'viewPayments', 'viewComplaints'].forEach(v => {
+            const el = document.getElementById(v); if(el) el.classList.add('hidden');
+            const mBtn = document.getElementById('nav-' + v); if(mBtn) mBtn.classList.remove('nav-active');
+            const dBtn = document.getElementById('desk-nav-' + v);
+            if(dBtn) { dBtn.classList.remove('nav-active', 'bg-green-50', 'text-green-700'); dBtn.classList.add('text-gray-600', 'hover:bg-gray-50'); }
+        });
+        
+        const target = document.getElementById(id);
+        if(target) target.classList.remove('hidden');
+        
+        const activeMNav = document.getElementById('nav-' + id); if(activeMNav) activeMNav.classList.add('nav-active');
+        const activeDNav = document.getElementById('desk-nav-' + id);
+        if(activeDNav) { activeDNav.classList.remove('text-gray-600', 'hover:bg-gray-50'); activeDNav.classList.add('nav-active', 'bg-green-50', 'text-green-700'); }
+        
+        window.scrollTo(0,0);
+        if(id === 'viewPayments') fetchPayments();
+    };
+
+    // Auth functions
+    window.toggleAuth = (isReg) => {
+        document.getElementById('loginBox').classList.toggle('hidden', isReg);
+        document.getElementById('registerBox').classList.toggle('hidden', !isReg);
+        window.scrollTo(0,0);
+    };
+
     window.toggleRecovery = (show) => {
         const modal = document.getElementById('recoveryModal');
-        if (show) {
-            modal.classList.add('flex');
-            modal.classList.remove('hidden');
-        } else {
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
+        if (show) { modal.classList.add('flex'); modal.classList.remove('hidden'); }
+        else { modal.classList.remove('flex'); modal.classList.add('hidden'); }
     };
-    
+
     window.sendResetLink = () => {
         const email = document.getElementById('recInputEmail').value.trim();
         if(!email) return window.showToast("Please enter your email", true);
-        sendPasswordResetEmail(auth, email).then(() => { window.showToast("Reset link sent!"); window.toggleRecovery(false); }).catch((err) => window.showToast(getFriendlyErrorMessage(err), true));
+        sendPasswordResetEmail(auth, email).then(() => {
+            window.showToast("Reset link sent!");
+            window.toggleRecovery(false);
+        }).catch((err) => window.showToast(getFriendlyErrorMessage(err), true));
     };
 
     window.sendReferral = () => {
         const email = document.getElementById('referralEmail').value.trim();
         if (!email || !email.includes('@')) return window.showToast("Please enter a valid email", true);
-        push(ref(db, 'referrals'), { friendEmail: email, referredBy: auth.currentUser.uid, referredByName: userLocalData.name || "A User", timestamp: serverTimestamp() });
+        push(ref(db, 'referrals'), {
+            friendEmail: email,
+            referredBy: auth.currentUser.uid,
+            referredByName: userLocalData.name || "A User",
+            timestamp: serverTimestamp()
+        });
         window.location.href = `mailto:${email}?subject=Invite to Oligo&body=Create your account here: ${window.location.href}`;
-        document.getElementById('referralEmail').value = ""; window.showToast("Invite drafted!");
+        document.getElementById('referralEmail').value = "";
+        window.showToast("Invite drafted!");
     };
 
-    function checkHolidayAlerts() {
-        const banner = document.getElementById('holidayAlertBanner'), msgEl = document.getElementById('holidayAlertMsg');
-        if(!banner || !msgEl) return;
-        const today = new Date();
-        for(let i=0; i<=4; i++) {
-            const checkDate = new Date(today); checkDate.setDate(today.getDate() + i);
-            const dateStr = checkDate.toISOString().split('T')[0];
-            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
-            if(holiday) {
-                const formattedDate = checkDate.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'short' });
-                msgEl.innerHTML = `Farm closed on <strong>${formattedDate}</strong> for <strong>${holiday.name}</strong>.<br>Please plan your orders accordingly.`;
-                banner.classList.remove('hidden'); return;
-            }
+    window.logout = () => {
+        signOut(auth).then(() => { window.location.reload(); }).catch(() => { window.location.reload(); });
+    };
+
+    // ================================================================
+    // PAYMENT FUNCTIONS - WebView Compatible
+    // ================================================================
+
+    let paymentResolve = null;
+    let paymentReject = null;
+
+    /**
+     * Open payment in WebView-friendly overlay
+     * Uses iframe for web, and works in APK WebView
+     */
+    function openPaymentWebView({ amount, description, onSuccess, onDismiss }) {
+        if (isPaymentInProgress) return;
+        if (!amount || amount <= 0) {
+            window.showToast("Nothing to pay.", true);
+            if (onDismiss) onDismiss();
+            return;
         }
-        banner.classList.add('hidden');
+
+        isPaymentInProgress = true;
+        const overlay = document.getElementById('paymentWebViewOverlay');
+        const iframe = document.getElementById('paymentIframe');
+        const loader = document.getElementById('paymentIframeLoader');
+        const successOverlay = document.getElementById('paymentSuccessOverlay');
+        const errorOverlay = document.getElementById('paymentErrorOverlay');
+
+        // Reset UI
+        successOverlay.classList.remove('show');
+        errorOverlay.classList.remove('show');
+        loader.style.display = 'flex';
+        iframe.style.display = 'none';
+        iframe.src = '';
+
+        // Show the overlay
+        overlay.classList.add('show');
+
+        // Build the Razorpay checkout URL with parameters
+        // Using the standard checkout flow but embedded in iframe
+        const params = new URLSearchParams({
+            key: RAZORPAY_KEY_ID,
+            amount: Math.round(amount * 100),
+            currency: 'INR',
+            name: RAZORPAY_BUSINESS_NAME,
+            description: description || 'Oligo order',
+            prefill_name: userLocalData?.name || '',
+            prefill_contact: userLocalData?.phone || '',
+            prefill_email: auth.currentUser?.email || '',
+            theme_color: '#10b981'
+        });
+
+        // For APK, we need to use a different approach - use the redirect URL
+        // and intercept the response
+        const checkoutUrl = `https://checkout.razorpay.com/v1/checkout?${params.toString()}`;
+
+        // Store payment data for callback
+        pendingOrderData = {
+            amount,
+            description,
+            onSuccess,
+            onDismiss
+        };
+
+        // Load the iframe
+        iframe.onload = function() {
+            loader.style.display = 'none';
+            iframe.style.display = 'block';
+        };
+
+        iframe.onerror = function() {
+            loader.style.display = 'none';
+            showPaymentError('Failed to load payment page. Please check your connection.');
+        };
+
+        // Set iframe src
+        iframe.src = checkoutUrl;
+
+        // Listen for messages from the iframe (for postMessage communication)
+        window.addEventListener('message', handlePaymentMessage);
+
+        // Also listen for URL changes (for redirect-based flow)
+        // Check periodically if the iframe URL changed to a success/failure URL
+        let urlCheckInterval = setInterval(() => {
+            try {
+                const iframeUrl = iframe.contentWindow?.location?.href;
+                if (iframeUrl) {
+                    // Check for success callback
+                    if (iframeUrl.includes('razorpay.com') && iframeUrl.includes('payment_id')) {
+                        // Extract payment ID from URL
+                        const paymentId = new URL(iframeUrl).searchParams.get('payment_id');
+                        if (paymentId) {
+                            clearInterval(urlCheckInterval);
+                            handlePaymentSuccess({ razorpay_payment_id: paymentId });
+                        }
+                    }
+                    // Check for failure
+                    if (iframeUrl.includes('error') || iframeUrl.includes('failed')) {
+                        clearInterval(urlCheckInterval);
+                        handlePaymentFailure('Payment was declined or cancelled.');
+                    }
+                }
+            } catch (e) {
+                // Cross-origin, cannot access iframe URL - this is normal
+            }
+        }, 2000);
+
+        // Cleanup function
+        window._paymentCleanup = function() {
+            clearInterval(urlCheckInterval);
+            window.removeEventListener('message', handlePaymentMessage);
+        };
     }
+
+    function handlePaymentMessage(event) {
+        // Handle postMessage from Razorpay iframe
+        try {
+            const data = event.data;
+            if (data && data.type === 'razorpay_payment') {
+                if (data.status === 'success') {
+                    handlePaymentSuccess({ razorpay_payment_id: data.payment_id });
+                } else if (data.status === 'failed') {
+                    handlePaymentFailure(data.message || 'Payment failed.');
+                }
+            }
+        } catch (e) {
+            // Ignore
+        }
+    }
+
+    function handlePaymentSuccess(response) {
+        isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
+
+        // Show success overlay briefly
+        const successOverlay = document.getElementById('paymentSuccessOverlay');
+        successOverlay.classList.add('show');
+
+        // Trigger the success callback
+        if (pendingOrderData && pendingOrderData.onSuccess) {
+            pendingOrderData.onSuccess(response);
+        }
+
+        // Auto-close after 3 seconds
+        setTimeout(() => {
+            window.closePaymentWebView(true);
+        }, 3000);
+    }
+
+    function handlePaymentFailure(message) {
+        isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
+
+        showPaymentError(message || 'Payment failed. Please try again.');
+    }
+
+    function showPaymentError(message) {
+        const errorOverlay = document.getElementById('paymentErrorOverlay');
+        document.getElementById('paymentErrorMsg').innerText = message || 'There was an issue processing your payment.';
+        errorOverlay.classList.add('show');
+    }
+
+    window.closePaymentWebView = (success = false) => {
+        const overlay = document.getElementById('paymentWebViewOverlay');
+        overlay.classList.remove('show');
+
+        const iframe = document.getElementById('paymentIframe');
+        iframe.src = '';
+
+        if (!success && pendingOrderData && pendingOrderData.onDismiss) {
+            pendingOrderData.onDismiss();
+        }
+
+        pendingOrderData = null;
+        isPaymentInProgress = false;
+        window._paymentCleanup && window._paymentCleanup();
+    };
+
+    window.retryPayment = () => {
+        // Hide error overlay
+        document.getElementById('paymentErrorOverlay').classList.remove('show');
+        
+        // Retry the payment
+        if (pendingOrderData) {
+            const { amount, description, onSuccess, onDismiss } = pendingOrderData;
+            openPaymentWebView({ amount, description, onSuccess, onDismiss });
+        }
+    };
+
+    /**
+     * Main payment function - uses WebView-friendly approach
+     */
+    function processPayment({ amount, description, onSuccess, onDismiss }) {
+        // Use the WebView-friendly overlay
+        openPaymentWebView({ amount, description, onSuccess, onDismiss });
+    }
+
+    // ================================================================
+    // CART & ORDER FUNCTIONS
+    // ================================================================
 
     window.toggleSubscriptionMode = () => {
         const isSub = document.getElementById('subToggle').checked;
@@ -1422,6 +1843,15 @@
         document.getElementById('pm-cod').classList.toggle('active', method === 'cod');
         document.getElementById('pm-online').classList.toggle('active', method === 'online');
         document.getElementById('testModeHint').classList.toggle('hidden', !(method === 'online' && IS_TEST_MODE));
+        
+        // Show redirect notice for online payments in APK
+        const notice = document.getElementById('paymentRedirectNotice');
+        if (method === 'online') {
+            notice.classList.add('show');
+        } else {
+            notice.classList.remove('show');
+        }
+        
         updateOrderButtonLabel();
     };
 
@@ -1438,6 +1868,76 @@
             btn.className = `w-full ${isOnline ? 'bg-purple-600 shadow-purple-100' : 'bg-green-600 shadow-green-100'} text-white py-5 rounded-[24px] font-bold shadow-xl transition active:scale-[0.98]`;
         }
     }
+
+    window.toggleDay = (btn, day) => {
+        btn.classList.toggle('selected');
+        if (selectedSubscriptionDays.includes(day)) {
+            selectedSubscriptionDays = selectedSubscriptionDays.filter(d => d !== day);
+        } else {
+            selectedSubscriptionDays.push(day);
+        }
+    };
+
+    window.openCart = () => {
+        renderBasket();
+        const dateInput = document.getElementById('checkoutDate');
+        const validDateStr = getNextValidDeliveryDate();
+        
+        dateInput.min = validDateStr;
+        if(!dateInput.value || dateInput.value < validDateStr) { dateInput.value = validDateStr; }
+        
+        document.getElementById('subToggle').checked = false;
+        selectedSubscriptionDays = [];
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+
+        currentPaymentMethod = 'cod';
+        document.getElementById('pm-cod').classList.add('active');
+        document.getElementById('pm-online').classList.remove('active');
+        document.getElementById('testModeHint').classList.add('hidden');
+        document.getElementById('paymentRedirectNotice').classList.remove('show');
+        appliedVoucher = null;
+        currentDiscount = 0;
+        document.getElementById('voucherCode').value = '';
+        document.getElementById('voucherMsg').classList.add('hidden');
+        document.getElementById('voucherDiscountSection').classList.add('hidden');
+
+        window.toggleSubscriptionMode();
+
+        const newDateInput = dateInput.cloneNode(true);
+        dateInput.parentNode.replaceChild(newDateInput, dateInput);
+        newDateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const dateStr = this.value;
+            if(selectedDate.getDay() === 0) {
+                window.showToast("No deliveries on Sundays.", true);
+                this.value = validDateStr;
+                calculateDeliveryLogic(validDateStr);
+                return;
+            }
+            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+            if(holiday) {
+                window.showToast(`Farm closed on ${dateStr} (${holiday.name}).`, true);
+                this.value = validDateStr;
+                calculateDeliveryLogic(validDateStr);
+                return;
+            }
+            calculateDeliveryLogic(dateStr);
+        });
+        calculateDeliveryLogic(newDateInput.value);
+        document.getElementById('cartModal').classList.remove('hidden');
+        document.getElementById('cartModal').classList.add('flex');
+        
+        const count = basket.reduce((a, b) => a + b.qty, 0);
+        const deskBadge = document.getElementById('deskCartBadge');
+        if(deskBadge) { deskBadge.innerText = count; deskBadge.classList.toggle('hidden', count === 0); }
+    };
+
+    window.closeCart = () => {
+        document.getElementById('cartModal').classList.add('hidden');
+        document.getElementById('cartModal').classList.remove('flex');
+        editingOrderId = null;
+        document.getElementById('orderNote').value = "";
+    };
 
     window.applyVoucher = () => {
         const codeInput = document.getElementById('voucherCode');
@@ -1461,120 +1961,6 @@
         }, { onlyOnce: true });
     };
 
-    function openRazorpayCheckout({ amount, description, onSuccess, onDismiss }) {
-        if (isPaymentInProgress) return;
-        if (!amount || amount <= 0) {
-            window.showToast("Nothing to pay.", true);
-            return;
-        }
-
-        isPaymentInProgress = true;
-
-        // Ensure Razorpay is loaded before proceeding
-        ensureRazorpayLoaded(() => {
-            if (!razorpayLoaded || typeof Razorpay === 'undefined') {
-                isPaymentInProgress = false;
-                window.showToast("Payment gateway unavailable. Please use Cash on Delivery or try again.", true);
-                if (onDismiss) onDismiss();
-                return;
-            }
-
-            try {
-                const options = {
-                    key: RAZORPAY_KEY_ID,
-                    amount: Math.round(amount * 100),
-                    currency: "INR",
-                    name: RAZORPAY_BUSINESS_NAME,
-                    description: description || "Oligo order",
-                    prefill: {
-                        name: userLocalData?.name || "",
-                        contact: userLocalData?.phone || "",
-                        email: auth.currentUser?.email || ""
-                    },
-                    theme: { color: "#10b981" },
-                    handler: function (response) {
-                        isPaymentInProgress = false;
-                        if (onSuccess) onSuccess(response);
-                    },
-                    modal: { 
-                        ondismiss: function () {
-                            isPaymentInProgress = false;
-                            if (onDismiss) onDismiss();
-                        }
-                    }
-                };
-
-                // For WebView, ensure the checkout opens properly
-                const rzp = new Razorpay(options);
-                
-                // Handle payment failure events
-                rzp.on('payment.failed', function (resp) {
-                    isPaymentInProgress = false;
-                    window.showToast("Payment failed: " + (resp.error?.description || "Please try again."), true);
-                });
-
-                // Open the checkout
-                rzp.open();
-            } catch (e) {
-                isPaymentInProgress = false;
-                console.error('Razorpay error:', e);
-                window.showToast("Payment gateway error. Please try again or use Cash on Delivery.", true);
-                if (onDismiss) onDismiss();
-            }
-        });
-    }
-
-    window.toggleDay = (btn, day) => {
-        btn.classList.toggle('selected');
-        if (selectedSubscriptionDays.includes(day)) {
-            selectedSubscriptionDays = selectedSubscriptionDays.filter(d => d !== day);
-        } else {
-            selectedSubscriptionDays.push(day);
-        }
-    };
-
-    window.openCart = () => { 
-        renderBasket(); 
-        const dateInput = document.getElementById('checkoutDate');
-        const validDateStr = getNextValidDeliveryDate();
-        
-        dateInput.min = validDateStr;
-        if(!dateInput.value || dateInput.value < validDateStr) { dateInput.value = validDateStr; }
-        
-        document.getElementById('subToggle').checked = false;
-        selectedSubscriptionDays = [];
-        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
-
-        currentPaymentMethod = 'cod';
-        document.getElementById('pm-cod').classList.add('active');
-        document.getElementById('pm-online').classList.remove('active');
-        document.getElementById('testModeHint').classList.add('hidden');
-        appliedVoucher = null;
-        currentDiscount = 0;
-        document.getElementById('voucherCode').value = '';
-        document.getElementById('voucherMsg').classList.add('hidden');
-        document.getElementById('voucherDiscountSection').classList.add('hidden');
-
-        window.toggleSubscriptionMode();
-
-        const newDateInput = dateInput.cloneNode(true);
-        dateInput.parentNode.replaceChild(newDateInput, dateInput);
-        newDateInput.addEventListener('change', function() {
-            const selectedDate = new Date(this.value); const dateStr = this.value;
-            if(selectedDate.getDay() === 0) { window.showToast("No deliveries on Sundays.", true); this.value = validDateStr; calculateDeliveryLogic(validDateStr); return; }
-            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
-            if(holiday) { window.showToast(`Farm closed on ${dateStr} (${holiday.name}).`, true); this.value = validDateStr; calculateDeliveryLogic(validDateStr); return; }
-            calculateDeliveryLogic(dateStr);
-        });
-        calculateDeliveryLogic(newDateInput.value);
-        document.getElementById('cartModal').classList.remove('hidden'); 
-        document.getElementById('cartModal').classList.add('flex');
-        
-        const count = basket.reduce((a, b) => a + b.qty, 0);
-        const deskBadge = document.getElementById('deskCartBadge');
-        if(deskBadge) { deskBadge.innerText = count; deskBadge.classList.toggle('hidden', count === 0); }
-    };
-    
     function calculateDeliveryLogic(selectedDateStr) {
         const todayStr = new Date().toISOString().split('T')[0];
         const msgEl = document.getElementById('deliveryMessage');
@@ -1627,214 +2013,320 @@
         totalEl.innerText = "Box " + Math.round(basketTotal - currentDiscount + currentDeliveryFee);
     }
 
-    window.closeCart = () => {
-        document.getElementById('cartModal').classList.add('hidden');
-        document.getElementById('cartModal').classList.remove('flex');
-        editingOrderId = null;
-        document.getElementById('orderNote').value = ""; 
-    };
-
-    window.toggleAuth = (isReg) => {
-        document.getElementById('loginBox').classList.toggle('hidden', isReg);
-        document.getElementById('registerBox').classList.toggle('hidden', !isReg);
-        window.scrollTo(0,0);
-    };
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('authSection').classList.add('hidden');
-            document.getElementById('authSection').classList.remove('flex');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('flex');
-            fetchUser(user.uid); 
-            fetchProducers(); 
-            fetchOrders(user.uid);
-            
-            onValue(ref(db, 'settings/holidays'), (snap) => { holidaysData = snap.val() || {}; checkHolidayAlerts(); });
-            
-            fetchModifications(user.uid);
-            fetchComplaints(user.uid);
-            
-            updateBadge();
-            const storedProd = localStorage.getItem('oligo_active_producer_id');
-            if(!storedProd) window.navTo('viewHome');
-        } else {
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('flex');
-            document.getElementById('authSection').classList.remove('hidden');
-            document.getElementById('authSection').classList.add('flex');
+    function renderBasket() {
+        const list = document.getElementById('cartItems'), totalEl = document.getElementById('cartTotal');
+        let total = 0;
+        if(basket.length === 0) {
+            list.innerHTML = `<p class="text-center text-gray-400 py-10 font-medium">Your basket is empty</p>`;
+            totalEl.innerText = "Box 0";
+            return;
         }
-        document.getElementById('appLoader').style.display = 'none';
-    });
-
-    function fetchUser(uid) {
-        onValue(ref(db, 'customers/' + uid), (snap) => {
-            const data = snap.val() || {}; userLocalData = data;
-            
-            const firstName = data.name ? data.name.split(' ')[0] : "Guest";
-            
-            const mHeader = document.getElementById('headerUserName');
-            if(mHeader) mHeader.innerText = firstName;
-            
-            const dHeader = document.getElementById('desktopUserName');
-            if(dHeader) dHeader.innerText = firstName;
-            
-            document.getElementById('profTitleName').innerText = data.name || "My Account";
-            document.getElementById('profName').value = data.name || "";
-            document.getElementById('profPhone').value = data.phone || "";
-            renderAddresses(); updateCheckoutSelect();
-        });
-    }
-    
-    function fetchModifications(uid) {
-        onValue(ref(db, 'subscription_modifications'), (snap) => {
-            const data = snap.val() || {};
-            allModifications = {};
-            Object.entries(data).forEach(([key, mod]) => {
-                if(mod.customerUid === uid) {
-                    allModifications[key] = mod;
-                }
-            });
-            if(currentManagingSubId && !document.getElementById('subManageModal').classList.contains('hidden')) {
-                 const sub = allSubsData[currentManagingSubId];
-                 if(sub) {
-                     renderVisualCalendar(sub);
-                     renderModificationList();
-                 }
-            }
-        });
+        list.innerHTML = basket.map((item, idx) => {
+            total += (item.price * item.qty);
+            return `<div class="flex justify-between items-center bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <div><p class="font-bold text-sm text-gray-800">${item.name}</p><p class="text-[10px] text-green-600 font-bold">Qty: ${item.qty}</p></div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.changeQty(${idx}, -1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">-</button>
+                    <span class="font-bold text-sm text-gray-800">${item.qty}</span>
+                    <button onclick="window.changeQty(${idx}, 1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        const dateIn = document.getElementById('checkoutDate').value;
+        if(dateIn) calculateDeliveryLogic(dateIn);
+        if(document.getElementById('subToggle').checked) totalEl.innerText = "Box " + Math.round(total - currentDiscount);
     }
 
-    function fetchPayments() {
-        if (!userLocalData || !userLocalData.phone) return;
-        const phone = userLocalData.phone;
-        const historyList = document.getElementById('paymentHistoryList');
-        const statusContainer = document.getElementById('payStatusContainer');
-        const outstandingEl = document.getElementById('payTotalOutstanding');
-        
-        historyList.innerHTML = '<div class="text-center py-4 text-gray-400">Loading records...</div>';
-        
-        onValue(ref(db, 'receivables'), (snap) => {
-            const data = snap.val();
-            if (!data) {
-                renderNoPayments();
+    window.changeQty = (idx, d) => {
+        basket[idx].qty += d;
+        if(basket[idx].qty <= 0) basket.splice(idx, 1);
+        saveBasket();
+        renderBasket();
+    };
+
+    function updateBadge() {
+        const count = basket.reduce((a, b) => a + b.qty, 0);
+        const b = document.getElementById('cartBadge');
+        b.innerText = count;
+        b.classList.toggle('hidden', count === 0);
+        const d = document.getElementById('deskCartBadge');
+        if(d) { d.innerText = count; d.classList.toggle('hidden', count === 0); }
+    }
+
+    // ================================================================
+    // PLACE ORDER - Uses WebView-friendly payment
+    // ================================================================
+
+    window.placeOrder = () => {
+        try {
+            if (isPaymentInProgress) {
+                window.showToast("Payment already in progress...", true);
                 return;
             }
-            
-            const clientEntry = Object.values(data).find(c => c.phone === phone);
-            
-            if (clientEntry) {
-                const due = parseFloat(clientEntry.amountDue) || 0;
-                outstandingEl.innerText = "₹" + due.toLocaleString();
-                currentAmountDue = due;
-                const payBtn = document.getElementById('payNowBtn');
-                if (payBtn) payBtn.classList.toggle('hidden', due <= 0);
-                if (payBtn) payBtn.classList.toggle('flex', due > 0);
-                document.getElementById('payTestModeHint').classList.toggle('hidden', !(due > 0 && IS_TEST_MODE));
-                
-                const statusDetails = `
-                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
-                        <span class="text-xs text-gray-500">Status</span>
-                        <span class="text-xs font-bold text-gray-800">${clientEntry.status || 'Pending'}</span>
-                    </div>
-                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
-                        <span class="text-xs text-gray-500">Last Ledger Date</span>
-                        <span class="text-xs font-bold text-gray-800">${clientEntry.lastUpdated ? new Date(clientEntry.lastUpdated).toLocaleDateString() : '-'}</span>
-                    </div>
-                `;
-                statusContainer.innerHTML = statusDetails;
-                
-                const logs = clientEntry.logs ? Object.values(clientEntry.logs).sort((a,b) => b.timestamp - a.timestamp) : [];
 
-                const totalPaid = logs.reduce((sum, l) => sum + (parseFloat(l.received) || 0), 0);
-                const splitRow = document.getElementById('paySplitRow');
-                if (splitRow) {
-                    splitRow.classList.remove('hidden');
-                    splitRow.classList.add('grid');
-                    document.getElementById('payTotalPaid').innerText = "₹" + totalPaid.toLocaleString();
-                    document.getElementById('payTotalPending').innerText = "₹" + due.toLocaleString();
-                }
-
-                if (logs.length === 0) {
-                    historyList.innerHTML = `<div class="empty-state"><div class="icon-wrap"><i class="fas fa-receipt"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">No transactions yet</h4><p class="text-xs text-gray-400">Payments and charges will appear here as they happen.</p></div>`;
-                } else {
-                    historyList.innerHTML = logs.map(l => {
-                        const isPayment = (parseFloat(l.received) || 0) > 0;
-                        const icon = isPayment ? 'fa-arrow-down text-green-500' : 'fa-info-circle text-blue-500';
-                        const amountDisplay = isPayment ? `<span class="font-bold text-green-600">+₹${l.received}</span>` : '';
-                        const noteText = l.note && l.note.trim() ? l.note : (isPayment ? 'Payment received' : 'Ledger update');
-                        
-                        return `
-                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fas ${icon}"></i></div>
-                                <div>
-                                    <p class="text-xs font-bold text-gray-700">${new Date(l.timestamp).toLocaleDateString()}</p>
-                                    <p class="text-[10px] text-gray-500">${noteText}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                ${amountDisplay}
-                                <p class="text-[9px] text-gray-400 uppercase">${l.status}</p>
-                            </div>
-                        </div>`;
-                    }).join('');
-                }
-                
-            } else {
-                renderNoPayments();
+            if (!userLocalData || !userLocalData.phone) {
+                window.showToast("Phone required.", true);
+                window.closeCart();
+                window.navTo('viewProfile');
+                return;
             }
-        });
-    }
-    
-    function renderNoPayments() {
-        document.getElementById('payTotalOutstanding').innerText = "₹0";
-        const splitRow = document.getElementById('paySplitRow');
-        if (splitRow) { splitRow.classList.add('hidden'); splitRow.classList.remove('grid'); }
-        currentAmountDue = 0;
-        const payBtn = document.getElementById('payNowBtn');
-        if (payBtn) { payBtn.classList.add('hidden'); payBtn.classList.remove('flex'); }
-        document.getElementById('payTestModeHint').classList.add('hidden');
+            if (basket.length === 0) return window.showToast("Basket empty.", true);
 
-        const uid = auth.currentUser ? auth.currentUser.uid : null;
-        const myPaidOrders = uid
-            ? Object.entries(allOrdersData || {})
-                .filter(([_, o]) => o.customerUid === uid && o.razorpayPaymentId && String(o.razorpayPaymentId).trim())
-                .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
-            : [];
+            const activeProducerId = localStorage.getItem('oligo_active_producer_id');
+            const addr = document.getElementById('checkoutAddrSelect').value;
+            if (!addr) return window.showToast("Select address.", true);
+            const note = document.getElementById('orderNote').value.trim();
+            const rawItemsTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
+            const discount = Math.min(currentDiscount || 0, rawItemsTotal);
+            const itemsTotal = rawItemsTotal - discount;
+            const voucherCode = appliedVoucher ? appliedVoucher.code : null;
+            const isSubscription = document.getElementById('subToggle').checked;
+            const isOnlinePayment = currentPaymentMethod === 'online';
 
-        if (myPaidOrders.length > 0) {
-            document.getElementById('payStatusContainer').innerHTML = '<p class="text-xs text-gray-600"><i class="fas fa-check-circle text-green-500 mr-1"></i>No dues — you pay upfront per order, so there\'s nothing owed.</p>';
-            document.getElementById('paymentHistoryList').innerHTML = myPaidOrders.map(([id, o]) => {
-                const amt = o.totalAmount ? '₹' + o.totalAmount : '';
-                const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '-';
-                return `
-                <div class="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fas fa-arrow-down text-green-500"></i></div>
-                        <div>
-                            <p class="text-xs font-bold text-gray-700">${dateStr}</p>
-                            <p class="text-[10px] text-gray-500">Order payment · ${o.customerName || ''}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-bold text-green-600">${amt}</span>
-                        <p class="text-[9px] text-gray-400 uppercase">PAID</p>
-                    </div>
-                </div>`;
-            }).join('');
-        } else {
-            document.getElementById('payStatusContainer').innerHTML = '<p class="text-xs text-gray-400">No active ledger found linked to your phone number.</p>';
-            document.getElementById('paymentHistoryList').innerHTML = `<div class="empty-state"><div class="icon-wrap"><i class="fas fa-receipt"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">No records found</h4><p class="text-xs text-gray-400">Nothing to show here yet.</p></div>`;
+            function paymentFields(razorpayResponse) {
+                return {
+                    paymentMethod: isOnlinePayment ? "ONLINE" : "COD",
+                    paymentStatus: isOnlinePayment ? "PAID" : "PENDING",
+                    voucherCode: voucherCode,
+                    discountAmount: discount,
+                    ...(razorpayResponse ? { razorpayPaymentId: razorpayResponse.razorpay_payment_id } : {})
+                };
+            }
+
+            function saveSubscription(razorpayResponse) {
+                if (isOnlinePayment) showPaymentProcessing();
+                const subData = {
+                    customerUid: auth.currentUser.uid,
+                    customerName: userLocalData.name || "Guest",
+                    customerPhone: userLocalData.phone,
+                    restaurantId: activeProducerId,
+                    items: basket,
+                    totalPerDelivery: itemsTotal,
+                    address: addr,
+                    frequency: selectedSubscriptionDays,
+                    duration: document.getElementById('subDuration').value,
+                    customerNote: note,
+                    status: "ACTIVE",
+                    sourceApp: "customer-sub-final",
+                    ...paymentFields(razorpayResponse),
+                    createdAt: serverTimestamp()
+                };
+                
+                const subRef = push(ref(db, 'subscriptions'), subData);
+                const subKey = subRef.key;
+
+                const firstOrderData = {
+                    customerUid: auth.currentUser.uid,
+                    customerName: userLocalData.name || "Guest",
+                    customerPhone: userLocalData.phone,
+                    restaurantId: activeProducerId,
+                    items: basket,
+                    totalAmount: itemsTotal + currentDeliveryFee,
+                    deliveryFee: currentDeliveryFee,
+                    deliveryMethod: currentDeliveryMethod,
+                    address: addr,
+                    requestedDate: getNextSubscriptionDate(selectedSubscriptionDays),
+                    customerNote: note + " (First Order of Subscription)",
+                    status: "PLACED",
+                    isSubscriptionOrder: true,
+                    subscriptionId: subKey,
+                    sourceApp: "customer-sub-final",
+                    ...paymentFields(razorpayResponse),
+                    createdAt: serverTimestamp()
+                };
+
+                Promise.all([
+                    subRef,
+                    push(ref(db, 'orders'), firstOrderData)
+                ]).then(() => {
+                    hidePaymentProcessing();
+                    basket = [];
+                    saveBasket();
+                    window.closeCart();
+                    renderBasket();
+                    showOrderResult({
+                        type: 'success',
+                        title: 'Subscription Started!',
+                        body: 'Your first delivery is on its way, and future deliveries will follow your chosen schedule.',
+                        summaryLines: [
+                            { label: 'Delivery days', value: selectedSubscriptionDays.join(', ') },
+                            { label: 'Per delivery', value: '₹' + Math.round(itemsTotal + currentDeliveryFee) },
+                            { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
+                        ],
+                        onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('subs'); }
+                    });
+                }).catch((err) => {
+                    hidePaymentProcessing();
+                    handleSaveFailure(razorpayResponse, err);
+                });
+            }
+
+            function saveOneTimeOrder(reqDate, razorpayResponse) {
+                if (isOnlinePayment) showPaymentProcessing();
+                const grandTotal = itemsTotal + currentDeliveryFee;
+                const orderData = {
+                    customerUid: auth.currentUser.uid,
+                    customerName: userLocalData.name || "Guest",
+                    customerPhone: userLocalData.phone,
+                    restaurantId: activeProducerId,
+                    items: basket,
+                    totalAmount: grandTotal,
+                    deliveryFee: currentDeliveryFee,
+                    deliveryMethod: currentDeliveryMethod,
+                    address: addr,
+                    requestedDate: reqDate,
+                    customerNote: note,
+                    status: "PLACED",
+                    sourceApp: "customer-sub-final",
+                    ...paymentFields(razorpayResponse),
+                    createdAt: serverTimestamp()
+                };
+                const savePromise = editingOrderId
+                    ? (() => { const d = { ...orderData }; delete d.createdAt; d.updatedAt = serverTimestamp(); return set(ref(db, 'orders/' + editingOrderId), d); })()
+                    : push(ref(db, 'orders'), orderData);
+                savePromise.then(() => successHandler(grandTotal, reqDate)).catch((err) => {
+                    hidePaymentProcessing();
+                    handleSaveFailure(razorpayResponse, err);
+                });
+            }
+
+            function handleSaveFailure(razorpayResponse, err) {
+                console.error("Order save failed:", err);
+                if (razorpayResponse) {
+                    showOrderResult({
+                        type: 'error',
+                        title: 'Payment received, order not confirmed',
+                        body: "Your payment succeeded, but we hit a problem saving your order. Please contact support with the Payment ID below — don't pay again.",
+                        summaryLines: [{ label: 'Payment ID', value: razorpayResponse.razorpay_payment_id }],
+                        primaryLabel: 'Get Support',
+                        onPrimary: () => { window.navTo('viewComplaints'); }
+                    });
+                } else {
+                    showOrderResult({
+                        type: 'error',
+                        title: 'Order not placed',
+                        body: 'Something went wrong saving your order. Please check your connection and try again.',
+                        primaryLabel: 'OK'
+                    });
+                }
+            }
+
+            function successHandler(grandTotal, reqDate) {
+                hidePaymentProcessing();
+                basket = [];
+                saveBasket();
+                window.closeCart();
+                renderBasket();
+                const wasEditing = !!editingOrderId;
+                editingOrderId = null;
+                showOrderResult({
+                    type: 'success',
+                    title: wasEditing ? 'Order Updated!' : 'Order Placed!',
+                    body: wasEditing ? "We've updated your order." : "We've got your order and it'll be prepared for delivery.",
+                    summaryLines: [
+                        { label: 'Delivery date', value: reqDate || '—' },
+                        { label: 'Total', value: '₹' + Math.round(grandTotal) },
+                        { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
+                    ],
+                    onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('history'); }
+                });
+            }
+
+            if (isSubscription) {
+                if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
+                const amountToCharge = itemsTotal + currentDeliveryFee;
+                if (isOnlinePayment) {
+                    processPayment({
+                        amount: amountToCharge,
+                        description: "Oligo subscription — first delivery",
+                        onSuccess: (response) => saveSubscription(response),
+                        onDismiss: () => { /* Cleanup if needed */ }
+                    });
+                } else {
+                    saveSubscription(null);
+                }
+            } else {
+                const reqDate = document.getElementById('checkoutDate').value;
+                if (!reqDate) return window.showToast("Select date.", true);
+                const amountToCharge = itemsTotal + currentDeliveryFee;
+                if (isOnlinePayment) {
+                    processPayment({
+                        amount: amountToCharge,
+                        description: "Oligo order",
+                        onSuccess: (response) => saveOneTimeOrder(reqDate, response),
+                        onDismiss: () => { /* Cleanup if needed */ }
+                    });
+                } else {
+                    saveOneTimeOrder(reqDate, null);
+                }
+            }
+        } catch(e) {
+            console.error('Order placement error:', e);
+            window.showToast("Error processing your order. Please try again.", true);
+            isPaymentInProgress = false;
+            hidePaymentProcessing();
         }
-    }
+    };
 
+    // ================================================================
+    // OTHER FUNCTIONS (Orders, Profile, Payments, Complaints, etc.)
+    // ================================================================
+
+    window.switchOrderView = (view) => {
+        const ordersDiv = document.getElementById('ordersList'),
+              subsDiv = document.getElementById('subsList'),
+              btnHistory = document.getElementById('tab-btn-history'),
+              btnSubs = document.getElementById('tab-btn-subs');
+        if (view === 'history') {
+            ordersDiv.classList.remove('hidden');
+            subsDiv.classList.add('hidden');
+            btnHistory.classList.add('active');
+            btnSubs.classList.remove('active');
+        } else {
+            ordersDiv.classList.add('hidden');
+            subsDiv.classList.remove('hidden');
+            btnSubs.classList.add('active');
+            btnHistory.classList.remove('active');
+        }
+    };
+
+    // Profile functions
+    window.updateProfile = () => {
+        const name = document.getElementById('profName').value.trim();
+        const phone = document.getElementById('profPhone').value.trim();
+        if (!name) return window.showToast("Full name required", true);
+        if (!phone) return window.showToast("Phone required", true);
+        set(ref(db, `customers/${auth.currentUser.uid}/name`), name);
+        set(ref(db, `customers/${auth.currentUser.uid}/phone`), phone).then(() => window.showToast("Profile Updated"));
+    };
+
+    window.toggleAddrForm = () => document.getElementById('addrForm').classList.toggle('hidden');
+
+    window.saveNewAddress = () => {
+        const joint = document.getElementById('newJointName').value.trim();
+        const loc = document.getElementById('newLocName').value.trim();
+        const full = document.getElementById('newFullAddr').value.trim();
+        if (!joint || !loc || !full) return window.showToast("All address fields required", true);
+        push(ref(db, `customers/${auth.currentUser.uid}/addresses`), { jointName: joint, location: loc, fullAddress: full }).then(() => {
+            document.getElementById('newJointName').value = "";
+            document.getElementById('newLocName').value = "";
+            document.getElementById('newFullAddr').value = "";
+            window.toggleAddrForm();
+            window.showToast("Address Saved");
+        });
+    };
+
+    window.deleteAddr = (id) => {
+        if (confirm("Remove this address?")) remove(ref(db, `customers/${auth.currentUser.uid}/addresses/${id}`));
+    };
+
+    // Payment functions (ledger)
     window.payNow = () => {
         if (!currentAmountDue || currentAmountDue <= 0) return window.showToast("No outstanding amount to pay.", true);
         const amountToPay = currentAmountDue;
         const payBtn = document.getElementById('payNowBtn');
         if (payBtn) payBtn.disabled = true;
-        openRazorpayCheckout({
+        processPayment({
             amount: amountToPay,
             description: "Outstanding balance",
             onSuccess: (response) => {
@@ -1876,12 +2368,11 @@
         }, { onlyOnce: true });
     }
 
+    // Complaint functions
     window.submitComplaint = async () => {
         const desc = document.getElementById('complaintDesc').value.trim();
         const files = document.getElementById('complaintImages').files;
-        
         if (!desc && files.length === 0) return window.showToast("Please add details or images", true);
-        
         let imageUrls = [];
         if (files.length > 0) {
             for (let i = 0; i < Math.min(files.length, 3); i++) {
@@ -1894,7 +2385,6 @@
                 } catch(e) { console.error(e); }
             }
         }
-        
         push(ref(db, 'complaints'), {
             customerUid: auth.currentUser.uid,
             customerName: userLocalData.name || 'User',
@@ -1910,6 +2400,7 @@
     };
 
     let _myComplaintsAll = [];
+    let _currentComplaintFilter = 'all';
 
     function fetchComplaints(uid) {
         onValue(ref(db, 'complaints'), (snap) => {
@@ -1923,14 +2414,18 @@
         });
     }
 
-    let _currentComplaintFilter = 'all';
     window.filterMyComplaints = (filter) => {
         _currentComplaintFilter = filter;
         ['all', 'open', 'resolved'].forEach(f => {
             const btn = document.getElementById('cf-' + f);
             if (!btn) return;
-            if (f === filter) { btn.classList.add('bg-white', 'shadow', 'text-gray-800'); btn.classList.remove('text-gray-500'); }
-            else { btn.classList.remove('bg-white', 'shadow', 'text-gray-800'); btn.classList.add('text-gray-500'); }
+            if (f === filter) {
+                btn.classList.add('bg-white', 'shadow', 'text-gray-800');
+                btn.classList.remove('text-gray-500');
+            } else {
+                btn.classList.remove('bg-white', 'shadow', 'text-gray-800');
+                btn.classList.add('text-gray-500');
+            }
         });
 
         const list = filter === 'open'
@@ -1989,31 +2484,13 @@
         </div>`;
     }
 
-    window.updateProfile = () => {
-        const name = document.getElementById('profName').value.trim();
-        const phone = document.getElementById('profPhone').value.trim();
-        if(!name) return window.showToast("Full name required", true);
-        if(!phone) return window.showToast("Phone required", true);
-        set(ref(db, `customers/${auth.currentUser.uid}/name`), name);
-        set(ref(db, `customers/${auth.currentUser.uid}/phone`), phone).then(() => window.showToast("Profile Updated"));
-    };
-
-    window.toggleAddrForm = () => document.getElementById('addrForm').classList.toggle('hidden');
-    window.saveNewAddress = () => {
-        const joint = document.getElementById('newJointName').value.trim();
-        const loc = document.getElementById('newLocName').value.trim();
-        const full = document.getElementById('newFullAddr').value.trim();
-        if(!joint || !loc || !full) return window.showToast("All address fields required", true);
-        push(ref(db, `customers/${auth.currentUser.uid}/addresses`), { jointName: joint, location: loc, fullAddress: full }).then(() => {
-            document.getElementById('newJointName').value = ""; document.getElementById('newLocName').value = ""; document.getElementById('newFullAddr').value = ""; 
-            toggleAddrForm(); window.showToast("Address Saved");
-        });
-    };
-    window.deleteAddr = (id) => { if(confirm("Remove this address?")) remove(ref(db, `customers/${auth.currentUser.uid}/addresses/${id}`)); };
-
     function renderAddresses() {
-        const list = document.getElementById('addressList'); const addrs = userLocalData.addresses || {};
-        if(Object.keys(addrs).length === 0) { list.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center col-span-2 italic">No locations saved.</p>`; return; }
+        const list = document.getElementById('addressList');
+        const addrs = userLocalData.addresses || {};
+        if (Object.keys(addrs).length === 0) {
+            list.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center col-span-2 italic">No locations saved.</p>`;
+            return;
+        }
         list.innerHTML = Object.entries(addrs).map(([id, a]) => `
             <div class="p-5 flex justify-between items-center bg-white border border-gray-100 group transition-all">
                 <div class="flex items-center gap-4">
@@ -2025,476 +2502,87 @@
     }
 
     function updateCheckoutSelect() {
-        const sel = document.getElementById('checkoutAddrSelect'); const addrs = userLocalData.addresses || {};
+        const sel = document.getElementById('checkoutAddrSelect');
+        const addrs = userLocalData.addresses || {};
         sel.innerHTML = '<option value="">-- Choose saved address --</option>';
-        Object.values(addrs).forEach(a => { sel.innerHTML += `<option value="${a.jointName} - ${a.location}: ${a.fullAddress}">${a.jointName} (${a.location})</option>`; });
+        Object.values(addrs).forEach(a => {
+            sel.innerHTML += `<option value="${a.jointName} - ${a.location}: ${a.fullAddress}">${a.jointName} (${a.location})</option>`;
+        });
     }
 
+    // Menu functions
     function fetchProducers() {
         onValue(ref(db, 'Production'), (snap) => {
-            const list = document.getElementById('producersList'); list.innerHTML = ''; const data = snap.val(); if(!data) return;
+            const list = document.getElementById('producersList');
+            list.innerHTML = '';
+            const data = snap.val();
+            if (!data) return;
             Object.entries(data).forEach(([id, p]) => {
-                if(p.approved) list.innerHTML += `<div onclick="window.openMenu('${id}', '${p.name}', '${p.cuisine}')" class="bg-white p-5 rounded-[32px] shadow-sm flex items-center gap-4 border border-gray-100 product-card cursor-pointer"><div class="bg-green-100 w-16 h-16 rounded-3xl flex items-center justify-center text-green-600 text-2xl shadow-inner"><i class="fas fa-leaf"></i></div><div class="flex-1"><h3 class="font-bold text-lg text-gray-800">${p.name}</h3><p class="text-xs text-gray-400">${p.cuisine || 'Fresh Harvest'}</p></div><i class="fas fa-chevron-right text-gray-200"></i></div>`;
+                if (p.approved) {
+                    list.innerHTML += `<div onclick="window.openMenu('${id}', '${p.name}', '${p.cuisine}')" class="bg-white p-5 rounded-[32px] shadow-sm flex items-center gap-4 border border-gray-100 product-card cursor-pointer">
+                        <div class="bg-green-100 w-16 h-16 rounded-3xl flex items-center justify-center text-green-600 text-2xl shadow-inner"><i class="fas fa-leaf"></i></div>
+                        <div class="flex-1"><h3 class="font-bold text-lg text-gray-800">${p.name}</h3><p class="text-xs text-gray-400">${p.cuisine || 'Fresh Harvest'}</p></div>
+                        <i class="fas fa-chevron-right text-gray-200"></i>
+                    </div>`;
+                }
             });
         });
     }
 
     window.openMenu = (id, name, cuisine) => {
         const currentId = localStorage.getItem('oligo_active_producer_id');
-        if(currentId && currentId !== id && basket.length > 0) { if(!confirm("Empty basket? You are switching farms.")) return; basket = []; saveBasket(); }
-        localStorage.setItem('oligo_active_producer_id', id); localStorage.setItem('oligo_active_producer_name', name);
-        document.getElementById('menuTitle').innerText = name; window.navTo('viewMenu');
-        onValue(ref(db, 'menus/' + id), (snap) => { menuData = snap.val() || {}; renderCatBar(); renderMenuItems('All'); });
+        if (currentId && currentId !== id && basket.length > 0) {
+            if (!confirm("Empty basket? You are switching farms.")) return;
+            basket = [];
+            saveBasket();
+        }
+        localStorage.setItem('oligo_active_producer_id', id);
+        localStorage.setItem('oligo_active_producer_name', name);
+        document.getElementById('menuTitle').innerText = name;
+        window.navTo('viewMenu');
+        onValue(ref(db, 'menus/' + id), (snap) => {
+            menuData = snap.val() || {};
+            renderCatBar();
+            window.renderMenuItems('All');
+        });
     };
 
     function renderCatBar() {
-        const bar = document.getElementById('categoryBar'); const cats = ['All', 'Microgreens', 'Live Trays', 'Mix Microgreens', 'Edible Flowers', 'Baby Leaves', 'Wheatgrass'];
+        const bar = document.getElementById('categoryBar');
+        const cats = ['All', 'Microgreens', 'Live Trays', 'Mix Microgreens', 'Edible Flowers', 'Baby Leaves', 'Wheatgrass'];
         bar.innerHTML = cats.map(c => `<button onclick="window.renderMenuItems('${c}')" id="catBtn-${c.replace(/\s+/g,'')}" class="cat-pill">${c}</button>`).join('');
     }
 
     window.renderMenuItems = (cat) => {
-        const list = document.getElementById('menuList'); list.innerHTML = '';
+        const list = document.getElementById('menuList');
+        list.innerHTML = '';
         document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
-        const btn = document.getElementById('catBtn-' + cat.replace(/\s+/g,'')); if(btn) btn.classList.add('active');
+        const btn = document.getElementById('catBtn-' + cat.replace(/\s+/g,''));
+        if (btn) btn.classList.add('active');
 
         Object.entries(menuData).forEach(([id, item]) => {
-            if(!item.available) return; if(cat !== 'All' && item.category !== cat) return;
-            list.innerHTML += `<div class="bg-white p-5 rounded-[32px] flex gap-5 items-center border border-gray-50 shadow-sm product-card"><div class="flex-1"><h4 class="font-bold text-lg text-gray-800">${item.name}</h4><p class="text-[11px] text-gray-500 mt-1">${item.description || 'Fresh harvest.'}</p><div class="flex justify-between items-center mt-3"><span class="font-bold text-green-700 text-lg">Box ${item.price}</span><button onclick="window.addToBasket('${id}', '${item.name}', '${item.price}', '${item.category || ''}')" class="bg-green-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md active:scale-90 transition">ADD</button></div></div></div>`;
+            if (!item.available) return;
+            if (cat !== 'All' && item.category !== cat) return;
+            list.innerHTML += `<div class="bg-white p-5 rounded-[32px] flex gap-5 items-center border border-gray-50 shadow-sm product-card">
+                <div class="flex-1"><h4 class="font-bold text-lg text-gray-800">${item.name}</h4>
+                <p class="text-[11px] text-gray-500 mt-1">${item.description || 'Fresh harvest.'}</p>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="font-bold text-green-700 text-lg">Box ${item.price}</span>
+                    <button onclick="window.addToBasket('${id}', '${item.name}', '${item.price}', '${item.category || ''}')" class="bg-green-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md active:scale-90 transition">ADD</button>
+                </div></div>
+            </div>`;
         });
     };
 
     window.addToBasket = (id, name, price, category) => {
-        const ex = basket.find(i => i.id === id); if(ex) ex.qty++; else basket.push({ id, name, price: parseFloat(price), category, qty: 1 });
-        saveBasket(); window.showToast("Added to basket");
+        const ex = basket.find(i => i.id === id);
+        if (ex) ex.qty++;
+        else basket.push({ id, name, price: parseFloat(price), category, qty: 1 });
+        saveBasket();
+        window.showToast("Added to basket");
     };
 
-    function updateBadge() { 
-        const count = basket.reduce((a, b) => a + b.qty, 0); 
-        const b = document.getElementById('cartBadge'); b.innerText = count; b.classList.toggle('hidden', count === 0);
-        const d = document.getElementById('deskCartBadge'); if(d) { d.innerText = count; d.classList.toggle('hidden', count === 0); }
-    }
-
-    function renderBasket() {
-        const list = document.getElementById('cartItems'), totalEl = document.getElementById('cartTotal'); let total = 0;
-        if(basket.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10 font-medium">Your basket is empty</p>`; totalEl.innerText = "Box 0"; return; }
-        list.innerHTML = basket.map((item, idx) => {
-            total += (item.price * item.qty);
-            return `<div class="flex justify-between items-center bg-gray-50 p-5 rounded-2xl border border-gray-100"><div><p class="font-bold text-sm text-gray-800">${item.name}</p><p class="text-[10px] text-green-600 font-bold">Qty: ${item.qty}</p></div><div class="flex items-center gap-3"><button onclick="window.changeQty(${idx}, -1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">-</button><span class="font-bold text-sm text-gray-800">${item.qty}</span><button onclick="window.changeQty(${idx}, 1)" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">+</button></div></div>`;
-        }).join('');
-        const dateIn = document.getElementById('checkoutDate').value;
-        if(dateIn) calculateDeliveryLogic(dateIn);
-        if(document.getElementById('subToggle').checked) totalEl.innerText = "Box " + Math.round(total - currentDiscount);
-    }
-
-    window.changeQty = (idx, d) => { basket[idx].qty += d; if(basket[idx].qty <= 0) basket.splice(idx, 1); saveBasket(); renderBasket(); };
-
-    window.placeOrder = () => {
-        try {
-            if(isPaymentInProgress) {
-                window.showToast("Payment already in progress...", true);
-                return;
-            }
-
-            if(!userLocalData || !userLocalData.phone) { window.showToast("Phone required.", true); window.closeCart(); window.navTo('viewProfile'); return; }
-            if (basket.length === 0) return window.showToast("Basket empty.", true);
-            const activeProducerId = localStorage.getItem('oligo_active_producer_id');
-            const addr = document.getElementById('checkoutAddrSelect').value;
-            if(!addr) return window.showToast("Select address.", true);
-            const note = document.getElementById('orderNote').value.trim();
-            const rawItemsTotal = basket.reduce((a, b) => a + (b.price * b.qty), 0);
-            const discount = Math.min(currentDiscount || 0, rawItemsTotal);
-            const itemsTotal = rawItemsTotal - discount;
-            const voucherCode = appliedVoucher ? appliedVoucher.code : null;
-            const isSubscription = document.getElementById('subToggle').checked;
-            const isOnlinePayment = currentPaymentMethod === 'online';
-
-            function paymentFields(razorpayResponse) {
-                return {
-                    paymentMethod: isOnlinePayment ? "ONLINE" : "COD",
-                    paymentStatus: isOnlinePayment ? "PAID" : "PENDING",
-                    voucherCode: voucherCode,
-                    discountAmount: discount,
-                    ...(razorpayResponse ? { razorpayPaymentId: razorpayResponse.razorpay_payment_id } : {})
-                };
-            }
-
-            function saveSubscription(razorpayResponse) {
-                if (isOnlinePayment) showPaymentProcessing();
-                const subData = { 
-                    customerUid: auth.currentUser.uid, 
-                    customerName: userLocalData.name || "Guest", 
-                    customerPhone: userLocalData.phone,
-                    restaurantId: activeProducerId,
-                    items: basket,
-                    totalPerDelivery: itemsTotal,
-                    address: addr,
-                    frequency: selectedSubscriptionDays,
-                    duration: document.getElementById('subDuration').value,
-                    customerNote: note,
-                    status: "ACTIVE", 
-                    sourceApp: "customer-sub-final",
-                    ...paymentFields(razorpayResponse),
-                    createdAt: serverTimestamp() 
-                };
-                
-                const subRef = push(ref(db, 'subscriptions'), subData);
-                const subKey = subRef.key;
-
-                const firstOrderData = {
-                    customerUid: auth.currentUser.uid,
-                    customerName: userLocalData.name || "Guest",
-                    customerPhone: userLocalData.phone,
-                    restaurantId: activeProducerId,
-                    items: basket,
-                    totalAmount: itemsTotal + currentDeliveryFee,
-                    deliveryFee: currentDeliveryFee,
-                    deliveryMethod: currentDeliveryMethod,
-                    address: addr,
-                    requestedDate: getNextSubscriptionDate(selectedSubscriptionDays),
-                    customerNote: note + " (First Order of Subscription)", 
-                    status: "PLACED",
-                    isSubscriptionOrder: true,
-                    subscriptionId: subKey,
-                    sourceApp: "customer-sub-final",
-                    ...paymentFields(razorpayResponse),
-                    createdAt: serverTimestamp()
-                };
-
-                Promise.all([
-                    subRef,
-                    push(ref(db, 'orders'), firstOrderData)
-                ]).then(() => {
-                    hidePaymentProcessing();
-                    basket = [];
-                    saveBasket();
-                    window.closeCart();
-                    renderBasket();
-                    showOrderResult({
-                        type: 'success',
-                        title: 'Subscription Started!',
-                        body: 'Your first delivery is on its way, and future deliveries will follow your chosen schedule.',
-                        summaryLines: [
-                            { label: 'Delivery days', value: selectedSubscriptionDays.join(', ') },
-                            { label: 'Per delivery', value: '₹' + Math.round(itemsTotal + currentDeliveryFee) },
-                            { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
-                        ],
-                        onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('subs'); }
-                    });
-                }).catch((err) => {
-                    hidePaymentProcessing();
-                    handleSaveFailure(razorpayResponse, err);
-                });
-            }
-
-            function saveOneTimeOrder(reqDate, razorpayResponse) {
-                if (isOnlinePayment) showPaymentProcessing();
-                const grandTotal = itemsTotal + currentDeliveryFee;
-                const orderData = { customerUid: auth.currentUser.uid, customerName: userLocalData.name || "Guest", customerPhone: userLocalData.phone, restaurantId: activeProducerId, items: basket, totalAmount: grandTotal, deliveryFee: currentDeliveryFee, deliveryMethod: currentDeliveryMethod, address: addr, requestedDate: reqDate, customerNote: note, status: "PLACED", sourceApp: "customer-sub-final", ...paymentFields(razorpayResponse), createdAt: serverTimestamp() };
-                const savePromise = editingOrderId
-                    ? (() => { const d = { ...orderData }; delete d.createdAt; d.updatedAt = serverTimestamp(); return set(ref(db, 'orders/' + editingOrderId), d); })()
-                    : push(ref(db, 'orders'), orderData);
-                savePromise.then(() => successHandler(grandTotal, reqDate)).catch((err) => {
-                    hidePaymentProcessing();
-                    handleSaveFailure(razorpayResponse, err);
-                });
-            }
-
-            function handleSaveFailure(razorpayResponse, err) {
-                console.error("Order save failed:", err);
-                if (razorpayResponse) {
-                    showOrderResult({
-                        type: 'error',
-                        title: 'Payment received, order not confirmed',
-                        body: "Your payment succeeded, but we hit a problem saving your order. Please contact support with the Payment ID below — don't pay again.",
-                        summaryLines: [ { label: 'Payment ID', value: razorpayResponse.razorpay_payment_id } ],
-                        primaryLabel: 'Get Support',
-                        onPrimary: () => { window.navTo('viewComplaints'); }
-                    });
-                } else {
-                    showOrderResult({
-                        type: 'error',
-                        title: 'Order not placed',
-                        body: 'Something went wrong saving your order. Please check your connection and try again.',
-                        primaryLabel: 'OK'
-                    });
-                }
-            }
-
-            function successHandler(grandTotal, reqDate) {
-                hidePaymentProcessing();
-                basket = [];
-                saveBasket();
-                window.closeCart();
-                renderBasket();
-                const wasEditing = !!editingOrderId;
-                editingOrderId = null;
-                showOrderResult({
-                    type: 'success',
-                    title: wasEditing ? 'Order Updated!' : 'Order Placed!',
-                    body: wasEditing ? "We've updated your order." : "We've got your order and it'll be prepared for delivery.",
-                    summaryLines: [
-                        { label: 'Delivery date', value: reqDate || '—' },
-                        { label: 'Total', value: '₹' + Math.round(grandTotal) },
-                        { label: 'Payment', value: isOnlinePayment ? 'Paid online' : 'Cash on delivery' }
-                    ],
-                    onPrimary: () => { window.navTo('viewOrders'); window.switchOrderView('history'); }
-                });
-            }
-
-            if (isSubscription) {
-                if (selectedSubscriptionDays.length === 0) return window.showToast("Select delivery days.", true);
-                const amountToCharge = itemsTotal + currentDeliveryFee;
-                if (isOnlinePayment) {
-                    openRazorpayCheckout({
-                        amount: amountToCharge,
-                        description: "Oligo subscription — first delivery",
-                        onSuccess: (response) => saveSubscription(response),
-                        onDismiss: () => { /* Cleanup if needed */ }
-                    });
-                } else {
-                    saveSubscription(null);
-                }
-            } else {
-                const reqDate = document.getElementById('checkoutDate').value;
-                if(!reqDate) return window.showToast("Select date.", true);
-                const amountToCharge = itemsTotal + currentDeliveryFee;
-                if (isOnlinePayment) {
-                    openRazorpayCheckout({
-                        amount: amountToCharge,
-                        description: "Oligo order",
-                        onSuccess: (response) => saveOneTimeOrder(reqDate, response),
-                        onDismiss: () => { /* Cleanup if needed */ }
-                    });
-                } else {
-                    saveOneTimeOrder(reqDate, null);
-                }
-            }
-        } catch(e) { 
-            console.error('Order placement error:', e);
-            window.showToast("Error processing your order. Please try again.", true);
-            isPaymentInProgress = false;
-            hidePaymentProcessing();
-        }
-    };
-
-    window.switchOrderView = (view) => {
-        const ordersDiv = document.getElementById('ordersList'), subsDiv = document.getElementById('subsList'), btnHistory = document.getElementById('tab-btn-history'), btnSubs = document.getElementById('tab-btn-subs');
-        if (view === 'history') { ordersDiv.classList.remove('hidden'); subsDiv.classList.add('hidden'); btnHistory.classList.add('active'); btnSubs.classList.remove('active'); } 
-        else { ordersDiv.classList.add('hidden'); subsDiv.classList.remove('hidden'); btnSubs.classList.add('active'); btnHistory.classList.remove('active'); }
-    }
-
-    window.manageSubscription = (subId) => {
-        const sub = allSubsData[subId];
-        if(!sub) return;
-        currentManagingSubId = subId;
-        
-        document.getElementById('subManageId').innerText = `ID: #${subId.slice(-6)}`;
-        document.getElementById('subStatusBadge').innerText = sub.status;
-        document.getElementById('subStatusBadge').className = `text-xs font-bold px-2 py-0.5 rounded-full ${sub.status === 'ACTIVE' ? 'text-blue-700 bg-white' : 'text-red-700 bg-white'}`;
-        
-        let totalDrops = 0;
-        const freq = sub.frequency ? sub.frequency.length : 0;
-        if(sub.duration === '4 Weeks') totalDrops = freq * 4;
-        else if(sub.duration === '12 Weeks') totalDrops = freq * 12;
-        else totalDrops = 99;
-        
-        let deliveredCount = 0; 
-        const progress = totalDrops > 0 ? (deliveredCount / totalDrops) * 100 : 0;
-        
-        document.getElementById('subTotalDeliveries').innerText = `${deliveredCount}/${totalDrops > 90 ? '∞' : totalDrops}`;
-        document.getElementById('subProgressBar').style.width = `${progress}%`;
-        
-        const start = new Date(sub.createdAt);
-        document.getElementById('subStartDate').innerText = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        
-        let endDate = "-";
-        if(sub.duration !== 'Until Cancelled') {
-            const weeks = parseInt(sub.duration.split(' ')[0]);
-            const end = new Date(start);
-            end.setDate(start.getDate() + (weeks * 7));
-            endDate = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-        document.getElementById('subEndDate').innerText = endDate;
-
-        const list = document.getElementById('subItemsList');
-        list.innerHTML = sub.items.map(i => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs"><span class="font-medium text-gray-700">${i.name}</span><span class="font-bold text-gray-900">x${i.qty}</span></div>`).join('');
-
-        document.getElementById('vacationDate').value = "";
-        document.getElementById('newDeliveryDate').value = "";
-        
-        currentVisualMonth = new Date().getMonth();
-        currentVisualYear = new Date().getFullYear();
-        renderVisualCalendar(sub);
-        
-        renderModificationList();
-        
-        window.setTargetInput('vacationDate');
-
-        document.getElementById('subManageModal').classList.remove('hidden');
-        document.getElementById('subManageModal').classList.add('flex');
-    };
-    
-    function renderVisualCalendar(sub) {
-        const cal = document.getElementById('visualCalendar');
-        const monthLabel = document.getElementById('calMonthYear');
-        cal.innerHTML = '';
-        
-        const firstDay = new Date(currentVisualYear, currentVisualMonth, 1);
-        const lastDay = new Date(currentVisualYear, currentVisualMonth + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startDayOfWeek = firstDay.getDay(); 
-        
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        monthLabel.innerText = `${monthNames[currentVisualMonth]} ${currentVisualYear}`;
-
-        const startDate = new Date(sub.createdAt);
-        startDate.setHours(0,0,0,0);
-        
-        let endDate = null;
-        if (sub.duration !== 'Until Cancelled') {
-            const weeks = parseInt(sub.duration);
-            endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + (weeks * 7));
-            endDate.setHours(23,59,59,999);
-        }
-
-        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
-
-        for(let i=0; i<startDayOfWeek; i++) { cal.innerHTML += `<div class="cal-day empty"></div>`; }
-        
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateObj = new Date(currentVisualYear, currentVisualMonth, d);
-            const dayOfWeekIndex = dateObj.getDay(); 
-            const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            const dayName = dayNamesShort[dayOfWeekIndex];
-            
-            const year = currentVisualYear;
-            const month = String(currentVisualMonth + 1).padStart(2, '0');
-            const day = String(d).padStart(2, '0');
-            const dateStr = `${year}-${month}-${day}`;
-            
-            let classList = "cal-day normal";
-            let clickAction = "";
-
-            const isBeforeStart = dateObj < startDate;
-            const isAfterEnd = endDate && dateObj > endDate;
-
-            if (isBeforeStart || isAfterEnd) {
-                classList = "cal-day out-of-range"; 
-            } else {
-                const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
-                const isSunday = (dayOfWeekIndex === 0);
-                const isSkipped = subMods.some(m => m.skipDate === dateStr);
-                const isAdded = subMods.some(m => m.moveDate === dateStr);
-
-                if(isHoliday || isSunday) {
-                    classList = "cal-day holiday";
-                } else if (isSkipped) {
-                    classList = "cal-day skipped";
-                } else if (isAdded) {
-                    classList = "cal-day added";
-                } else {
-                    clickAction = `onclick="window.selectCalDate('${dateStr}')"`;
-                    if (sub.frequency && sub.frequency.includes(dayName)) {
-                        classList = "cal-day delivery";
-                    } else {
-                        classList = "cal-day normal";
-                    }
-                }
-            }
-            cal.innerHTML += `<div class="${classList}" ${clickAction}>${d}</div>`;
-        }
-    }
-    
-    function renderModificationList() {
-        const container = document.getElementById('activeModificationsList');
-        container.innerHTML = '';
-        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
-        
-        if(subMods.length > 0) {
-            container.innerHTML = '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Pending / Active Changes</p>';
-            subMods.forEach(m => {
-                let statusColor = m.status === 'APPROVED' ? 'text-green-600' : 'text-orange-600';
-                let moveText = m.moveDate && m.moveDate.includes('Skip') ? 'Skipped' : `Moved to ${new Date(m.moveDate).toLocaleDateString()}`;
-                const skipDisplay = !isNaN(new Date(m.skipDate).getTime()) ? new Date(m.skipDate).toLocaleDateString() : m.skipDate;
-
-                container.innerHTML += `
-                    <div class="bg-white border border-gray-100 p-2 rounded-lg text-xs flex justify-between items-center mb-1">
-                        <div>
-                            <span class="text-red-500 font-bold line-through mr-1">${skipDisplay}</span>
-                            <i class="fas fa-arrow-right text-gray-300 mx-1"></i>
-                            <span class="font-bold text-gray-700">${moveText}</span>
-                        </div>
-                        <span class="${statusColor} font-bold text-[9px] uppercase">${(m.status || 'PENDING').replace('_', ' ')}</span>
-                    </div>
-                `;
-            });
-        }
-    }
-    
-    window.changeCalMonth = (delta) => {
-        currentVisualMonth += delta;
-        if(currentVisualMonth > 11) { currentVisualMonth = 0; currentVisualYear++; }
-        else if(currentVisualMonth < 0) { currentVisualMonth = 11; currentVisualYear--; }
-        const sub = allSubsData[currentManagingSubId];
-        if(sub) renderVisualCalendar(sub);
-    };
-    
-    window.setTargetInput = (id) => {
-        targetInputId = id;
-        document.getElementById('vacationDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
-        document.getElementById('newDeliveryDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
-        document.getElementById(id).classList.add('ring-2', 'ring-orange-400', 'border-orange-500');
-    };
-    
-    window.selectCalDate = (dateStr) => {
-        const input = document.getElementById(targetInputId);
-        if(input) {
-            input.value = dateStr;
-            if(targetInputId === 'vacationDate') window.validateVacationDate(input);
-        }
-    };
-
-    window.closeSubManage = () => {
-        document.getElementById('subManageModal').classList.add('hidden');
-        document.getElementById('subManageModal').classList.remove('flex');
-        currentManagingSubId = null;
-    };
-
-    window.validateVacationDate = (input) => {
-        const dateStr = input.value;
-        if(!dateStr) return;
-        const d = new Date(dateStr);
-        if(d.getDay() === 0) { window.showToast("Sundays are closed.", true); input.value = ""; return; }
-        const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
-        if(holiday) { window.showToast(`Farm closed: ${holiday.name}`, true); input.value = ""; return; }
-    };
-
-    window.submitReschedule = () => {
-        const skip = document.getElementById('vacationDate').value;
-        const move = document.getElementById('newDeliveryDate').value;
-        if(!skip) return window.showToast("Select a date to skip", true);
-        const payload = { subscriptionId: currentManagingSubId, customerUid: auth.currentUser.uid, customerName: userLocalData.name, skipDate: skip, moveDate: move || "Skipped (No Reschedule)", status: "PENDING_REVIEW", createdAt: serverTimestamp() };
-        push(ref(db, 'subscription_modifications'), payload).then(() => { window.showToast("Request Sent to Admin"); window.closeSubManage(); }).catch(e => window.showToast("Error sending request", true));
-    };
-
-    window.cancelSubscription = () => {
-        if(!currentManagingSubId) return;
-        if(confirm("Stop this subscription? Future orders will not be generated.")) {
-            update(ref(db, 'subscriptions/' + currentManagingSubId), { status: 'CANCELLED' })
-            .then(() => {
-                 window.showToast("Subscription Cancelled");
-                 window.closeSubManage();
-            });
-        }
-    };
-    
-    window.deleteSub = (subId) => {
-        if(confirm("Remove this subscription record permanently?")) {
-            remove(ref(db, 'subscriptions/' + subId)).then(() => window.showToast("Record Deleted"));
-        }
-    };
-
+    // Order fetching
     function orderSkeletonHTML(n) {
         let out = '';
         for (let i = 0; i < n; i++) {
@@ -2512,9 +2600,11 @@
         document.getElementById('subsList').innerHTML = orderSkeletonHTML(2);
 
         onValue(ref(db, 'orders'), (snap) => {
-            const list = document.getElementById('ordersList'); list.innerHTML = ''; 
-            const data = snap.val(); allOrdersData = data || {}; 
-            const myOrders = data ? Object.entries(data).filter(([_, o]) => o.customerUid === uid).sort((a,b) => b[1].createdAt - a[1].createdAt) : [];
+            const list = document.getElementById('ordersList');
+            list.innerHTML = '';
+            const data = snap.val();
+            allOrdersData = data || {};
+            const myOrders = data ? Object.entries(data).filter(([_, o]) => o.customerUid === uid).sort((a, b) => b[1].createdAt - a[1].createdAt) : [];
 
             if (myOrders.length === 0) {
                 list.innerHTML = `<div class="empty-state lg:col-span-2"><div class="icon-wrap"><i class="fas fa-basket-shopping"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">No orders yet</h4><p class="text-xs text-gray-400">Your one-time orders will show up here once placed.</p></div>`;
@@ -2522,7 +2612,10 @@
             }
 
             myOrders.forEach(([id, o]) => {
-                const statusColor = o.status === 'PLACED' ? 'bg-blue-100 text-blue-600' : (o.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : (o.status === 'CANCELLED' ? 'bg-red-100 text-red-500' : 'bg-gray-100 text-gray-500'));
+                const statusColor = o.status === 'PLACED' ? 'bg-blue-100 text-blue-600' :
+                                   (o.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                   (o.status === 'CANCELLED' ? 'bg-red-100 text-red-500' :
+                                   'bg-gray-100 text-gray-500'));
                 const cancelBtn = o.status === 'PLACED'
                     ? `<button onclick="window.cancelOrder('${id}')" class="action-btn bg-red-50 text-red-500">Cancel</button>`
                     : '';
@@ -2544,8 +2637,10 @@
         });
 
         onValue(ref(db, 'subscriptions'), (snap) => {
-            const list = document.getElementById('subsList'); list.innerHTML = '';
-            const data = snap.val(); allSubsData = data || {};
+            const list = document.getElementById('subsList');
+            list.innerHTML = '';
+            const data = snap.val();
+            allSubsData = data || {};
             const mySubs = data ? Object.entries(data).filter(([_, s]) => s.customerUid === uid) : [];
 
             if (mySubs.length === 0) {
@@ -2566,8 +2661,8 @@
                     ? new Date(deliveredForThisSub[0].requestedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })
                     : null;
 
-                const deleteBtn = s.status === 'CANCELLED' 
-                    ? `<button onclick="window.deleteSub('${id}')" class="text-red-400 hover:text-red-600 ml-2" title="Delete Record"><i class="fas fa-trash"></i></button>` 
+                const deleteBtn = s.status === 'CANCELLED'
+                    ? `<button onclick="window.deleteSub('${id}')" class="text-red-400 hover:text-red-600 ml-2" title="Delete Record"><i class="fas fa-trash"></i></button>`
                     : '';
 
                 list.innerHTML += `<div class="modern-card p-6 border border-blue-50 bg-blue-50/20">
@@ -2595,6 +2690,228 @@
         });
     }
 
+    // Subscription management
+    window.manageSubscription = (subId) => {
+        const sub = allSubsData[subId];
+        if (!sub) return;
+        currentManagingSubId = subId;
+
+        document.getElementById('subManageId').innerText = `ID: #${subId.slice(-6)}`;
+        document.getElementById('subStatusBadge').innerText = sub.status;
+        document.getElementById('subStatusBadge').className = `text-xs font-bold px-2 py-0.5 rounded-full ${sub.status === 'ACTIVE' ? 'text-blue-700 bg-white' : 'text-red-700 bg-white'}`;
+
+        let totalDrops = 0;
+        const freq = sub.frequency ? sub.frequency.length : 0;
+        if (sub.duration === '4 Weeks') totalDrops = freq * 4;
+        else if (sub.duration === '12 Weeks') totalDrops = freq * 12;
+        else totalDrops = 99;
+
+        let deliveredCount = 0;
+        const progress = totalDrops > 0 ? (deliveredCount / totalDrops) * 100 : 0;
+
+        document.getElementById('subTotalDeliveries').innerText = `${deliveredCount}/${totalDrops > 90 ? '∞' : totalDrops}`;
+        document.getElementById('subProgressBar').style.width = `${progress}%`;
+
+        const start = new Date(sub.createdAt);
+        document.getElementById('subStartDate').innerText = start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        let endDate = "-";
+        if (sub.duration !== 'Until Cancelled') {
+            const weeks = parseInt(sub.duration.split(' ')[0]);
+            const end = new Date(start);
+            end.setDate(start.getDate() + (weeks * 7));
+            endDate = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        document.getElementById('subEndDate').innerText = endDate;
+
+        const list = document.getElementById('subItemsList');
+        list.innerHTML = sub.items.map(i => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs"><span class="font-medium text-gray-700">${i.name}</span><span class="font-bold text-gray-900">x${i.qty}</span></div>`).join('');
+
+        document.getElementById('vacationDate').value = "";
+        document.getElementById('newDeliveryDate').value = "";
+
+        currentVisualMonth = new Date().getMonth();
+        currentVisualYear = new Date().getFullYear();
+        renderVisualCalendar(sub);
+        renderModificationList();
+        window.setTargetInput('vacationDate');
+
+        document.getElementById('subManageModal').classList.remove('hidden');
+        document.getElementById('subManageModal').classList.add('flex');
+    };
+
+    function renderVisualCalendar(sub) {
+        const cal = document.getElementById('visualCalendar');
+        const monthLabel = document.getElementById('calMonthYear');
+        cal.innerHTML = '';
+
+        const firstDay = new Date(currentVisualYear, currentVisualMonth, 1);
+        const lastDay = new Date(currentVisualYear, currentVisualMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startDayOfWeek = firstDay.getDay();
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        monthLabel.innerText = `${monthNames[currentVisualMonth]} ${currentVisualYear}`;
+
+        const startDate = new Date(sub.createdAt);
+        startDate.setHours(0,0,0,0);
+
+        let endDate = null;
+        if (sub.duration !== 'Until Cancelled') {
+            const weeks = parseInt(sub.duration);
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + (weeks * 7));
+            endDate.setHours(23,59,59,999);
+        }
+
+        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
+
+        for (let i = 0; i < startDayOfWeek; i++) { cal.innerHTML += `<div class="cal-day empty"></div>`; }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateObj = new Date(currentVisualYear, currentVisualMonth, d);
+            const dayOfWeekIndex = dateObj.getDay();
+            const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const dayName = dayNamesShort[dayOfWeekIndex];
+
+            const year = currentVisualYear;
+            const month = String(currentVisualMonth + 1).padStart(2, '0');
+            const day = String(d).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
+            let classList = "cal-day normal";
+            let clickAction = "";
+
+            const isBeforeStart = dateObj < startDate;
+            const isAfterEnd = endDate && dateObj > endDate;
+
+            if (isBeforeStart || isAfterEnd) {
+                classList = "cal-day out-of-range";
+            } else {
+                const isHoliday = Object.values(holidaysData || {}).some(h => h.date === dateStr);
+                const isSunday = (dayOfWeekIndex === 0);
+                const isSkipped = subMods.some(m => m.skipDate === dateStr);
+                const isAdded = subMods.some(m => m.moveDate === dateStr);
+
+                if (isHoliday || isSunday) {
+                    classList = "cal-day holiday";
+                } else if (isSkipped) {
+                    classList = "cal-day skipped";
+                } else if (isAdded) {
+                    classList = "cal-day added";
+                } else {
+                    clickAction = `onclick="window.selectCalDate('${dateStr}')"`;
+                    if (sub.frequency && sub.frequency.includes(dayName)) {
+                        classList = "cal-day delivery";
+                    } else {
+                        classList = "cal-day normal";
+                    }
+                }
+            }
+            cal.innerHTML += `<div class="${classList}" ${clickAction}>${d}</div>`;
+        }
+    }
+
+    function renderModificationList() {
+        const container = document.getElementById('activeModificationsList');
+        container.innerHTML = '';
+        const subMods = Object.values(allModifications).filter(m => m.subscriptionId === currentManagingSubId);
+
+        if (subMods.length > 0) {
+            container.innerHTML = '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Pending / Active Changes</p>';
+            subMods.forEach(m => {
+                let statusColor = m.status === 'APPROVED' ? 'text-green-600' : 'text-orange-600';
+                let moveText = m.moveDate && m.moveDate.includes('Skip') ? 'Skipped' : `Moved to ${new Date(m.moveDate).toLocaleDateString()}`;
+                const skipDisplay = !isNaN(new Date(m.skipDate).getTime()) ? new Date(m.skipDate).toLocaleDateString() : m.skipDate;
+
+                container.innerHTML += `
+                    <div class="bg-white border border-gray-100 p-2 rounded-lg text-xs flex justify-between items-center mb-1">
+                        <div>
+                            <span class="text-red-500 font-bold line-through mr-1">${skipDisplay}</span>
+                            <i class="fas fa-arrow-right text-gray-300 mx-1"></i>
+                            <span class="font-bold text-gray-700">${moveText}</span>
+                        </div>
+                        <span class="${statusColor} font-bold text-[9px] uppercase">${(m.status || 'PENDING').replace('_', ' ')}</span>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    window.changeCalMonth = (delta) => {
+        currentVisualMonth += delta;
+        if (currentVisualMonth > 11) { currentVisualMonth = 0; currentVisualYear++; }
+        else if (currentVisualMonth < 0) { currentVisualMonth = 11; currentVisualYear--; }
+        const sub = allSubsData[currentManagingSubId];
+        if (sub) renderVisualCalendar(sub);
+    };
+
+    window.setTargetInput = (id) => {
+        targetInputId = id;
+        document.getElementById('vacationDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
+        document.getElementById('newDeliveryDate').classList.remove('ring-2', 'ring-orange-400', 'border-orange-500');
+        document.getElementById(id).classList.add('ring-2', 'ring-orange-400', 'border-orange-500');
+    };
+
+    window.selectCalDate = (dateStr) => {
+        const input = document.getElementById(targetInputId);
+        if (input) {
+            input.value = dateStr;
+            if (targetInputId === 'vacationDate') window.validateVacationDate(input);
+        }
+    };
+
+    window.closeSubManage = () => {
+        document.getElementById('subManageModal').classList.add('hidden');
+        document.getElementById('subManageModal').classList.remove('flex');
+        currentManagingSubId = null;
+    };
+
+    window.validateVacationDate = (input) => {
+        const dateStr = input.value;
+        if (!dateStr) return;
+        const d = new Date(dateStr);
+        if (d.getDay() === 0) { window.showToast("Sundays are closed.", true); input.value = ""; return; }
+        const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+        if (holiday) { window.showToast(`Farm closed: ${holiday.name}`, true); input.value = ""; return; }
+    };
+
+    window.submitReschedule = () => {
+        const skip = document.getElementById('vacationDate').value;
+        const move = document.getElementById('newDeliveryDate').value;
+        if (!skip) return window.showToast("Select a date to skip", true);
+        const payload = {
+            subscriptionId: currentManagingSubId,
+            customerUid: auth.currentUser.uid,
+            customerName: userLocalData.name,
+            skipDate: skip,
+            moveDate: move || "Skipped (No Reschedule)",
+            status: "PENDING_REVIEW",
+            createdAt: serverTimestamp()
+        };
+        push(ref(db, 'subscription_modifications'), payload).then(() => {
+            window.showToast("Request Sent to Admin");
+            window.closeSubManage();
+        }).catch(e => window.showToast("Error sending request", true));
+    };
+
+    window.cancelSubscription = () => {
+        if (!currentManagingSubId) return;
+        if (confirm("Stop this subscription? Future orders will not be generated.")) {
+            update(ref(db, 'subscriptions/' + currentManagingSubId), { status: 'CANCELLED' })
+            .then(() => {
+                window.showToast("Subscription Cancelled");
+                window.closeSubManage();
+            });
+        }
+    };
+
+    window.deleteSub = (subId) => {
+        if (confirm("Remove this subscription record permanently?")) {
+            remove(ref(db, 'subscriptions/' + subId)).then(() => window.showToast("Record Deleted"));
+        }
+    };
+
     window.cancelOrder = (orderId) => {
         const order = allOrdersData[orderId];
         if (!order || order.status !== 'PLACED') return window.showToast("This order can no longer be cancelled.", true);
@@ -2610,17 +2927,285 @@
         localStorage.setItem('oligo_active_producer_id', order.restaurantId);
         (order.originalItems || order.items).forEach(item => {
             const ex = basket.find(b => b.id === item.id);
-            if(ex) ex.qty += parseInt(item.qty); else basket.push({...item, price: parseFloat(item.price), qty: parseInt(item.qty)});
+            if (ex) ex.qty += parseInt(item.qty);
+            else basket.push({ ...item, price: parseFloat(item.price), qty: parseInt(item.qty) });
         });
-        saveBasket(); window.openCart(); window.showToast("Items added.");
+        saveBasket();
+        window.openCart();
+        window.showToast("Items added.");
     };
 
-    window.logout = () => { signOut(auth).then(() => { window.location.reload(); }).catch((error) => { window.location.reload(); }); };
-    document.getElementById('loginForm').onsubmit = (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value.trim(), document.getElementById('loginPass').value.trim()).catch(err => window.showToast(getFriendlyErrorMessage(err), true)); };
-    document.getElementById('registerForm').onsubmit = (e) => { e.preventDefault(); createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value.trim(), document.getElementById('regPass').value.trim()).then(res => set(ref(db, 'customers/'+res.user.uid), {name: document.getElementById('regName').value.trim(), email: document.getElementById('regEmail').value.trim()})).catch(err => window.showToast(getFriendlyErrorMessage(err), true)); };
-    let searchTimeout; window.addressSearch = (input) => { clearTimeout(searchTimeout); const q = input.value.trim(); if(q.length<3) { document.getElementById('addrSearchList').classList.add('hidden'); return; } searchTimeout = setTimeout(async()=>{ try{ const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5`); const data = await res.json(); const list = document.getElementById('addrSearchList'); list.innerHTML = data.features.map(f => `<div class="search-item" onclick="window.applyAddressResult('${(f.properties.name||f.properties.street||'Location').replace(/'/g,"\\'")}', '${[f.properties.city,f.properties.state].filter(Boolean).join(', ').replace(/'/g,"\\'")}')"><i class="fas fa-map-marker-alt"></i><div><span class="name">${f.properties.name||f.properties.street}</span><span class="addr">${f.properties.city||''}</span></div></div>`).join(''); list.classList.remove('hidden'); }catch(e){} }, 400); };
-    window.applyAddressResult = (n, a) => { document.getElementById('newFullAddr').value = n + ", " + a; document.getElementById('addrSearchList').classList.add('hidden'); };
-    document.addEventListener('click', e => { if(!e.target.closest('.relative')) document.getElementById('addrSearchList').classList.add('hidden'); });
+    // Payment history
+    function fetchPayments() {
+        if (!userLocalData || !userLocalData.phone) return;
+        const phone = userLocalData.phone;
+        const historyList = document.getElementById('paymentHistoryList');
+        const statusContainer = document.getElementById('payStatusContainer');
+        const outstandingEl = document.getElementById('payTotalOutstanding');
+
+        historyList.innerHTML = '<div class="text-center py-4 text-gray-400">Loading records...</div>';
+
+        onValue(ref(db, 'receivables'), (snap) => {
+            const data = snap.val();
+            if (!data) {
+                renderNoPayments();
+                return;
+            }
+
+            const clientEntry = Object.values(data).find(c => c.phone === phone);
+
+            if (clientEntry) {
+                const due = parseFloat(clientEntry.amountDue) || 0;
+                outstandingEl.innerText = "₹" + due.toLocaleString();
+                currentAmountDue = due;
+                const payBtn = document.getElementById('payNowBtn');
+                if (payBtn) payBtn.classList.toggle('hidden', due <= 0);
+                if (payBtn) payBtn.classList.toggle('flex', due > 0);
+                document.getElementById('payTestModeHint').classList.toggle('hidden', !(due > 0 && IS_TEST_MODE));
+
+                const statusDetails = `
+                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
+                        <span class="text-xs text-gray-500">Status</span>
+                        <span class="text-xs font-bold text-gray-800">${clientEntry.status || 'Pending'}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-purple-200 pb-2 mb-2">
+                        <span class="text-xs text-gray-500">Last Ledger Date</span>
+                        <span class="text-xs font-bold text-gray-800">${clientEntry.lastUpdated ? new Date(clientEntry.lastUpdated).toLocaleDateString() : '-'}</span>
+                    </div>
+                `;
+                statusContainer.innerHTML = statusDetails;
+
+                const logs = clientEntry.logs ? Object.values(clientEntry.logs).sort((a, b) => b.timestamp - a.timestamp) : [];
+
+                const totalPaid = logs.reduce((sum, l) => sum + (parseFloat(l.received) || 0), 0);
+                const splitRow = document.getElementById('paySplitRow');
+                if (splitRow) {
+                    splitRow.classList.remove('hidden');
+                    splitRow.classList.add('grid');
+                    document.getElementById('payTotalPaid').innerText = "₹" + totalPaid.toLocaleString();
+                    document.getElementById('payTotalPending').innerText = "₹" + due.toLocaleString();
+                }
+
+                if (logs.length === 0) {
+                    historyList.innerHTML = `<div class="empty-state"><div class="icon-wrap"><i class="fas fa-receipt"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">No transactions yet</h4><p class="text-xs text-gray-400">Payments and charges will appear here as they happen.</p></div>`;
+                } else {
+                    historyList.innerHTML = logs.map(l => {
+                        const isPayment = (parseFloat(l.received) || 0) > 0;
+                        const icon = isPayment ? 'fa-arrow-down text-green-500' : 'fa-info-circle text-blue-500';
+                        const amountDisplay = isPayment ? `<span class="font-bold text-green-600">+₹${l.received}</span>` : '';
+                        const noteText = l.note && l.note.trim() ? l.note : (isPayment ? 'Payment received' : 'Ledger update');
+
+                        return `
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-gray-700">${new Date(l.timestamp).toLocaleDateString()}</p>
+                                    <p class="text-[10px] text-gray-500">${noteText}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                ${amountDisplay}
+                                <p class="text-[9px] text-gray-400 uppercase">${l.status}</p>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            } else {
+                renderNoPayments();
+            }
+        });
+    }
+
+    function renderNoPayments() {
+        document.getElementById('payTotalOutstanding').innerText = "₹0";
+        const splitRow = document.getElementById('paySplitRow');
+        if (splitRow) { splitRow.classList.add('hidden'); splitRow.classList.remove('grid'); }
+        currentAmountDue = 0;
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) { payBtn.classList.add('hidden'); payBtn.classList.remove('flex'); }
+        document.getElementById('payTestModeHint').classList.add('hidden');
+
+        const uid = auth.currentUser ? auth.currentUser.uid : null;
+        const myPaidOrders = uid
+            ? Object.entries(allOrdersData || {})
+                .filter(([_, o]) => o.customerUid === uid && o.razorpayPaymentId && String(o.razorpayPaymentId).trim())
+                .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
+            : [];
+
+        if (myPaidOrders.length > 0) {
+            document.getElementById('payStatusContainer').innerHTML = '<p class="text-xs text-gray-600"><i class="fas fa-check-circle text-green-500 mr-1"></i>No dues — you pay upfront per order, so there\'s nothing owed.</p>';
+            document.getElementById('paymentHistoryList').innerHTML = myPaidOrders.map(([id, o]) => {
+                const amt = o.totalAmount ? '₹' + o.totalAmount : '';
+                const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '-';
+                return `
+                <div class="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center"><i class="fas fa-arrow-down text-green-500"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-700">${dateStr}</p>
+                            <p class="text-[10px] text-gray-500">Order payment · ${o.customerName || ''}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-green-600">${amt}</span>
+                        <p class="text-[9px] text-gray-400 uppercase">PAID</p>
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            document.getElementById('payStatusContainer').innerHTML = '<p class="text-xs text-gray-400">No active ledger found linked to your phone number.</p>';
+            document.getElementById('paymentHistoryList').innerHTML = `<div class="empty-state"><div class="icon-wrap"><i class="fas fa-receipt"></i></div><h4 class="font-bold text-gray-700 text-sm mb-1">No records found</h4><p class="text-xs text-gray-400">Nothing to show here yet.</p></div>`;
+        }
+    }
+
+    function fetchModifications(uid) {
+        onValue(ref(db, 'subscription_modifications'), (snap) => {
+            const data = snap.val() || {};
+            allModifications = {};
+            Object.entries(data).forEach(([key, mod]) => {
+                if (mod.customerUid === uid) {
+                    allModifications[key] = mod;
+                }
+            });
+            if (currentManagingSubId && !document.getElementById('subManageModal').classList.contains('hidden')) {
+                const sub = allSubsData[currentManagingSubId];
+                if (sub) {
+                    renderVisualCalendar(sub);
+                    renderModificationList();
+                }
+            }
+        });
+    }
+
+    function checkHolidayAlerts() {
+        const banner = document.getElementById('holidayAlertBanner'),
+              msgEl = document.getElementById('holidayAlertMsg');
+        if (!banner || !msgEl) return;
+        const today = new Date();
+        for (let i = 0; i <= 4; i++) {
+            const checkDate = new Date(today);
+            checkDate.setDate(today.getDate() + i);
+            const dateStr = checkDate.toISOString().split('T')[0];
+            const holiday = Object.values(holidaysData).find(h => h.date === dateStr);
+            if (holiday) {
+                const formattedDate = checkDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' });
+                msgEl.innerHTML = `Farm closed on <strong>${formattedDate}</strong> for <strong>${holiday.name}</strong>.<br>Please plan your orders accordingly.`;
+                banner.classList.remove('hidden');
+                return;
+            }
+        }
+        banner.classList.add('hidden');
+    }
+
+    function fetchUser(uid) {
+        onValue(ref(db, 'customers/' + uid), (snap) => {
+            const data = snap.val() || {};
+            userLocalData = data;
+
+            const firstName = data.name ? data.name.split(' ')[0] : "Guest";
+
+            const mHeader = document.getElementById('headerUserName');
+            if (mHeader) mHeader.innerText = firstName;
+
+            const dHeader = document.getElementById('desktopUserName');
+            if (dHeader) dHeader.innerText = firstName;
+
+            document.getElementById('profTitleName').innerText = data.name || "My Account";
+            document.getElementById('profName').value = data.name || "";
+            document.getElementById('profPhone').value = data.phone || "";
+            renderAddresses();
+            updateCheckoutSelect();
+        });
+    }
+
+    // Address search
+    let searchTimeout;
+    window.addressSearch = (input) => {
+        clearTimeout(searchTimeout);
+        const q = input.value.trim();
+        if (q.length < 3) {
+            document.getElementById('addrSearchList').classList.add('hidden');
+            return;
+        }
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5`);
+                const data = await res.json();
+                const list = document.getElementById('addrSearchList');
+                list.innerHTML = data.features.map(f => `<div class="search-item" onclick="window.applyAddressResult('${(f.properties.name || f.properties.street || 'Location').replace(/'/g, "\\'")}', '${[f.properties.city, f.properties.state].filter(Boolean).join(', ').replace(/'/g, "\\'")}')"><i class="fas fa-map-marker-alt"></i><div><span class="name">${f.properties.name || f.properties.street}</span><span class="addr">${f.properties.city || ''}</span></div></div>`).join('');
+                list.classList.remove('hidden');
+            } catch (e) {}
+        }, 400);
+    };
+
+    window.applyAddressResult = (n, a) => {
+        document.getElementById('newFullAddr').value = n + ", " + a;
+        document.getElementById('addrSearchList').classList.add('hidden');
+    };
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.relative')) document.getElementById('addrSearchList').classList.add('hidden');
+    });
+
+    // ================================================================
+    // AUTH STATE
+    // ================================================================
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('authSection').classList.remove('flex');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('flex');
+            fetchUser(user.uid);
+            fetchProducers();
+            fetchOrders(user.uid);
+
+            onValue(ref(db, 'settings/holidays'), (snap) => {
+                holidaysData = snap.val() || {};
+                checkHolidayAlerts();
+            });
+
+            fetchModifications(user.uid);
+            fetchComplaints(user.uid);
+
+            updateBadge();
+            const storedProd = localStorage.getItem('oligo_active_producer_id');
+            if (!storedProd) window.navTo('viewHome');
+        } else {
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('flex');
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('authSection').classList.add('flex');
+        }
+        document.getElementById('appLoader').style.display = 'none';
+    });
+
+    // Login/Register handlers
+    document.getElementById('loginForm').onsubmit = (e) => {
+        e.preventDefault();
+        signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value.trim(), document.getElementById('loginPass').value.trim())
+            .catch(err => window.showToast(getFriendlyErrorMessage(err), true));
+    };
+
+    document.getElementById('registerForm').onsubmit = (e) => {
+        e.preventDefault();
+        createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value.trim(), document.getElementById('regPass').value.trim())
+            .then(res => set(ref(db, 'customers/' + res.user.uid), {
+                name: document.getElementById('regName').value.trim(),
+                email: document.getElementById('regEmail').value.trim()
+            }))
+            .catch(err => window.showToast(getFriendlyErrorMessage(err), true));
+    };
+
+    // Hide loader after page load
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if (loader && loader.style.display !== 'none') {
+            loader.style.display = 'none';
+        }
+    }, 3000);
 </script>
 </body>
 </html>
